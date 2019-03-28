@@ -1,6 +1,6 @@
 const _ = require('lodash');
 module.exports = function (sequelize, DataTypes) {
-	return sequelize.define('t_apply_cache_server_conf', {
+	return sequelize.define('t_expand_server', {
 		id: {
 			type: DataTypes.INTEGER(11),
 			allowNull: false,
@@ -12,27 +12,33 @@ module.exports = function (sequelize, DataTypes) {
 			allowNull: false,
 			defaultValue: ''
 		},
-		apply_id: {
+		patch_version: {
+			type: DataTypes.STRING(50),
+			allowNull: false,
+			defaultValue: ''
+		},
+		operation_id: {
 			type: DataTypes.INTEGER(11),
 			allowNull: false,
-			unique: 'applyModule',
+		},
+		app_name: {
+			type: DataTypes.STRING(100),
+			allowNull: false,
+			defaultValue: ''
 		},
 		module_name: {
 			type: DataTypes.STRING(100),
 			allowNull: false,
-			unique: 'applyModule',
 			defaultValue: ''
 		},
 		group_name: {
 			type: DataTypes.STRING(100),
 			allowNull: false,
-			unique: 'applyModule',
 			defaultValue: ''
 		},
 		server_name: {
 			type: DataTypes.STRING(100),
 			allowNull: false,
-			unique: 'applyModule',
 			defaultValue: ''
 		},
 		server_ip: {
@@ -80,8 +86,11 @@ module.exports = function (sequelize, DataTypes) {
 			allowNull: false,
 			defaultValue: false
 		},
+		// Timestamps
+		createdAt: DataTypes.DATE,
+		updatedAt: DataTypes.DATE,
 	}, {
-		tableName: 't_apply_cache_server_conf',
-		timestamps: false
+		tableName: 't_expand_server',
+		timestamps: true
 	});
 };
