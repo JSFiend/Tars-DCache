@@ -77,6 +77,9 @@ let dcacheApiConf = [
 	// 模块操作
 	['post', '/cache/expandModule', ModuleOperation.expandDCache],
 
+  // 查询迁移管理
+	['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],
+
 	// cache 配置中心
 	['get', '/cache/getConfig', getConfig],
 	['post', '/cache/addConfig', addConfig, {
