@@ -76,7 +76,18 @@ let dcacheApiConf = [
 
 	// 模块操作
 	['post', '/cache/expandModule', ModuleOperation.expandDCache],
-
+  ['post', '/cache/configTransfer', ModuleOperation.configTransfer, {
+    appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
+  }],
+  ['post', '/cache/reduceDcache', ModuleOperation.reduceDcache, {
+    appName: 'notEmpty', moduleName: 'notEmpty', srcGroupName: 'notEmpty'
+  }],
+  ['post', '/cache/stopTransfer', ModuleOperation.stopTransfer, {
+    appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
+  }],
+  ['post', '/cache/deleteTransfer', ModuleOperation.deleteTransfer, {
+    appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
+  }],
   // 查询迁移管理
 	['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],
 

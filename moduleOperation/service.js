@@ -75,7 +75,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
     version: '',
     replace,
   });
-
+  console.log(option, 'aaaaaa');
   let {__return, expandRsp, expandRsp: {errMsg}} = await DCacheOptPrx.expandDCache(option);
   assert(__return === 0, errMsg);
   return expandRsp;
@@ -169,5 +169,74 @@ service.getRouterChange = async function ( {
   assert(__return === 0, errMsg);
   return rsp
 };
+
+/**
+ * 缩容 opt 接口
+ * 0 require string appName;
+ * 1 require string moduleName;
+ * 2 require vector<string> srcGroupName; // 源组组名
+ *
+ * */
+service.reduceDCache = async function ({appName='', moduleName='', srcGroupName=[]}) {
+  let option = new DCacheOptStruct.ReduceReq();
+  option.readFromObject({
+    appName,
+    moduleName,
+    srcGroupName
+  });
+  let {__return, reduceRsp, reduceRsp: {errMsg}} = await DCacheOptPrx.reduceDCache(option);
+  assert(__return === 0, errMsg);
+  return reduceRsp;
+}
+
+/**
+ * 停止迁移、扩容、缩容操作
+ * @appName     应用名
+ * @moduleName  模块名
+ * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
+ * @srcGroupName 原组
+ * @dstGroupName 目标组
+ * 
+ */
+service.stopTransfer = async function ({appName = '', moduleName ='', type = '1', srcGroupName = '', dstGroupName = ''}) {
+  let option = new DCacheOptStruct.StopTransferReq();
+  option.readFromObject({
+    appName,
+    moduleName,
+    type: '' + type,
+    srcGroupName,
+    dstGroupName, 
+  });
+  let {__return, rsp, rsp: {errMsg}} = await DCacheOptPrx.stopTransfer(option);
+  assert(__return === 0, errMsg);
+  return rsp;
+}
+
+/**
+ * 删除迁移、扩容、缩容操作记录
+ * @appName     应用名
+ * @moduleName  模块名
+ * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
+ * @srcGroupName 原组
+ * @dstGroupName 目标组
+ * 
+ */
+service.deleteTransfer = async function ({appName = '', moduleName ='', type = '1', srcGroupName = '', dstGroupName = ''}) {
+  let option = new DCacheOptStruct.DeleteTransferReq();
+  option.readFromObject({
+    appName,
+    moduleName,
+    type: '' + type,
+    srcGroupName,
+    dstGroupName, 
+  });
+  let res = await DCacheOptPrx.deleteTransfer(option);
+  console.log(res);
+  let {__return, rsp, rsp: {errMsg}} = res;
+  assert(__return === 0, errMsg);
+  return rsp;
+}
+
+
 
 module.exports = service;
