@@ -113,7 +113,7 @@ const ModuleConfigController = {
 					serverIp: item.server_ip,
 					templateFile: 'tars.default',
 					type: item.server_type ? 'S' : 'M',
-					bakSrcServerName: item.server_type ? `DCache.${ServerConf[0].serverName}` : '',
+					bakSrcServerName: item.server_type ? `DCache.${ServerConf[0].server_name}` : '',
 					idc: item.area,
 					priority: item.server_type ? '2' : '1',
 					groupName: item.group_name,
