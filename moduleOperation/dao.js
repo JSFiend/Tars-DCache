@@ -3,29 +3,51 @@ const Dao = {};
 
 
 Dao.add = async function ({type, status, appName, moduleName, cache_version}) {
-	return await tModuleOperation.create({type, status, appName, moduleName, cache_version})
+  return await tModuleOperation.create({type, status, appName, moduleName, cache_version})
 };
 
 Dao.findOne = async function ({where = {}, attributes = [], queryServers = true, include = []}) {
 
-	if (queryServers) {
-		let queryServersItem = {
-			model: tExpandServer,
-			as: 'expandServers',
-			raw: true
-		};
-		include.push(queryServersItem)
-	}
-	let option = {
-		where,
-		include,
-	};
-	if (attributes.length) option.attributes = attributes;
-	return await tModuleOperation.findOne(option);
+  if (queryServers) {
+    let queryServersItem = {
+      model: tExpandServer,
+      as: 'expandServers',
+      raw: true
+    };
+    include.push(queryServersItem)
+  }
+  let option = {
+    where,
+    include,
+  };
+  if (attributes.length) option.attributes = attributes;
+  return await tModuleOperation.findOne(option);
+};
+
+Dao.update = async function ({where, values}) {
+  return await tModuleOperation.update(values, {where})
+};
+
+Dao.findAll = async function ({where = {}, attributes = [], queryServers = true, include = []}) {
+
+  if (queryServers) {
+    let queryServersItem = {
+      model: tExpandServer,
+      as: 'expandServers',
+      raw: true
+    };
+    include.push(queryServersItem)
+  }
+  let option = {
+    where,
+    include,
+  };
+  if (attributes.length) option.attributes = attributes;
+  return await tModuleOperation.findAll(option);
 };
 
 Dao.destroy = async function (option) {
-	return await tModuleOperation.destroy(option)
+  return await tModuleOperation.destroy(option)
 };
 
 module.exports = Dao;

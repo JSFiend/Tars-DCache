@@ -8,6 +8,9 @@ const util = require(path.join(cwd, './app/tools/util'));
 
 const {Op} = require('sequelize');
 
+// 触发轮询任务
+require('./timeTask');
+
 const Service = require('./service.js');
 
 
@@ -15,7 +18,7 @@ const Controller = {
   /**
    * 扩容
    */
-  async expandDCache (ctx) {
+  async expandDCache(ctx) {
     // 是否重试
     let replace = true;
 
@@ -34,13 +37,13 @@ const Controller = {
 
       // 扩容服务入库 opt
       let expandServers = operationRecord.get('expandServers');
-      let args = await Service.optExpandDCache({appName, moduleName, expandServers, cache_version, replace, });
+      let args = await Service.optExpandDCache({appName, moduleName, expandServers, cache_version, replace,});
 
       // 扩容服务入库 opt 后， 发布服务
       let expandRsq = await Service.releaseServer({expandServers});
 
-      // 发布完成后， 需要入库 前台 dcache 数据库
-
+      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
+      let serverConfig = await Service.putInServerConfig({appName, servers});
       ctx.makeResObj(200, '', expandRsq)
     } catch (err) {
 
@@ -52,10 +55,10 @@ const Controller = {
   /**
    * 获取迁移管理数据
    */
-  async getRouterChange (ctx) {
+  async getRouterChange(ctx) {
     try {
-      let { type } = ctx.paramsObj;
-      let rsp =  await Service.getRouterChange({type});
+      let {type} = ctx.paramsObj;
+      let rsp = await Service.getRouterChange({type});
       ctx.makeResObj(200, '', rsp)
     } catch (err) {
       logger.error('[module operation getRouterChange]:', err);
@@ -63,13 +66,13 @@ const Controller = {
       ctx.makeResObj(500, err.message);
     }
   },
-  async configTransfer (ctx) {
+  async configTransfer(ctx) {
     try {
       let {appName, moduleName, type, srcGroupName, dstGroupName} = ctx.paramsObj;
-      let = rsp = await Service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+      let rsp = await Service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      
+
       logger.error('[module operation configTransfer]:', err);
       console.error(err);
       ctx.makeResObj(500, err.message)
@@ -78,9 +81,9 @@ const Controller = {
   /**
    * 缩容
    */
-  async reduceDcache (ctx) {
+  async reduceDcache(ctx) {
     try {
-      let {appName, moduleName, srcGroupName} = ctx.paramsOb;
+      let {appName, moduleName, srcGroupName} = ctx.paramsObj;
       let rsp = await Service.reduceDCache({appName, moduleName, srcGroupName});
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
@@ -96,12 +99,13 @@ const Controller = {
    * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
    * @srcGroupName 原组
    * @dstGroupName 目标组
-   * 
+   *
    */
-  async stopTransfer (ctx) {
+  async stopTransfer(ctx) {
     try {
       let {appName, moduleName, type, srcGroupName, dstGroupName} = ctx.paramsObj;
       let rsp = await Service.stopTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('stopTransfer:', err);
@@ -116,19 +120,64 @@ const Controller = {
    * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
    * @srcGroupName 原组
    * @dstGroupName 目标组
-   * 
+   *
    */
-  async deleteTransfer (ctx) {
+  async deleteTransfer(ctx) {
     try {
       let {appName, moduleName, type, srcGroupName, dstGroupName} = ctx.paramsObj;
+      // 删除 opt 记录
       let rsp = await Service.deleteTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+
+      // 删除dcache 操作记录
+      let operationType = {
+        '0': 'migration',
+        '1': 'expand',
+        '2': 'shrinage'
+      }
+      rsp = await Service.deleteOperation({appName, moduleName, type: operationType[type]});
+
       ctx.makeResObj(200, '', rsp);
+
     } catch (err) {
       logger.error('stopTransfer:', err);
       console.error(err);
       ctx.makeResObj(500, err.message)
     }
   },
+  async deleteOperation(ctx) {
+    try {
+      let {appName, moduleName, type, srcGroupName, dstGroupName} = ctx.paramsObj;
+
+      type = '' + type;
+
+      // 删除dcache 操作记录
+      let operationType = {
+        '0': 'migration',
+        '1': 'expand',
+        '2': 'shrinage'
+      }
+      rsp = await Service.deleteOperation({appName, moduleName, type: operationType[type]});
+
+      ctx.makeResObj(200, '', rsp);
+
+    } catch (err) {
+      logger.error('stopTransfer:', err);
+      console.error(err);
+      ctx.makeResObj(500, err.message)
+    }
+  },
+  async hasOperation(ctx) {
+    try {
+      let {appName, moduleName, type} = ctx.paramsObj;
+      let rsp = await Service.findOne({appName, moduleName, type, status: {[Op.not]: "0"}});
+      ctx.makeResObj(200, '', rsp ? true : false)
+
+    } catch (err) {
+      logger.error('has Operation:', err);
+      console.error(err);
+      ctx.makeResObj(500, err.message)
+    }
+  }
 
 };
 

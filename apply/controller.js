@@ -78,9 +78,9 @@ const ApplyController = {
 
 			// 获取 cache 服务
 			let cacheServers = await getPublishSuccessModuleConfig();
-			console.log('cacheServers', cacheServers);
 			cacheServers.forEach(cacheServer => {
 				cacheServer = cacheServer.get({plain: true});
+				// console.log(cacheServer.server_name)
 				// 看看存不存在该应用， 不存在就返回
 				let applyNode = rootNode.find(node => node.name === cacheServer.AppBase.name);
 				if (!applyNode) return false;
@@ -132,6 +132,9 @@ const ApplyController = {
 			ctx.makeResObj(500, e.message, {});
 		}
 	},
+	async getPublishSuccessModuleConfig (ctx) {
+    ctx.makeResObj(200, '', await getPublishSuccessModuleConfig())
+  },
 	getApplyList: async (ctx) => {
 		try {
 			let applys = await ApplyService.getApplyList();

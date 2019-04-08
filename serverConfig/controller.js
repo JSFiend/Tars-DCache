@@ -65,15 +65,17 @@ const ServerConfigController = {
 			});
 
 			let serverNameList = cacheServerList.map(server => `Dcache.${server.server_name}`);
-
 			//用 cache 的服务名去读 tars 的服务
 			let serverList = await ServerService.getServerNameList({applicationList: '', serverNameList, allAttr: true});
-
+			// console.log(serverList)
+			// return ctx.makeResObj(200, '', {
+			// 	serverList,
+			// 	serverNameList
+			// })
 			// 添加 cache 的服务类型， 是主机、备机还是镜像呢
 			serverList.forEach(server => {
 				let server_name = server.get('server_name');
 				let cacheServer = cacheServerList.find(server => server.server_name === server_name);
-				console.log(cacheServer);
 				let app_name = cacheServer.get('applyBase').get('name');
 				let cache_version = cacheServer.get('moduleBase').get('cache_module_type');
 				server.setDataValue('area', cacheServer.get('area'));

@@ -53,6 +53,7 @@ let dcacheApiConf = [
 	['get', '/install_and_publish', ApplyController.installAndPublish],
 	['get', '/get_release_progress', ApplyController.getReleaseProgress],
 	['get', '/cache/hasModule', ApplyController.hasModule],
+	['get', '/cache/getPublishSuccessModuleConfig', ApplyController.getPublishSuccessModuleConfig],
 
 	// proxy
 	['post', '/cache/removeProxy', ProxyController.removeProxy],
@@ -87,6 +88,12 @@ let dcacheApiConf = [
   }],
   ['post', '/cache/deleteTransfer', ModuleOperation.deleteTransfer, {
     appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
+  }],
+  ['post', '/cache/deleteOperation', ModuleOperation.deleteOperation, {
+    appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
+  }],
+  ['get', '/cache/hasOperation', ModuleOperation.hasOperation, {
+    appName: 'notEmpty', moduleName: 'notEmpty'
   }],
   // 查询迁移管理
 	['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],

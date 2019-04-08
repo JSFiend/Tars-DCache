@@ -6,6 +6,12 @@ Dao.add = async function ({area, operation_id, app_name, module_name, group_name
 	return await tExpandServer.create({area, operation_id, app_name, module_name, group_name, server_name, server_ip, server_type, memory, shmKey, idc_area, status, modify_person, modify_time, is_docker, patch_version})
 };
 
+Dao.destroy = async function ({where = {appName, moduleName, type}}) {
+  Dao.destroy({
+    where: where
+  })
+}
+
 Dao.addList = async function (option) {
 	return await tExpandServer.bulkCreate(option)
 };

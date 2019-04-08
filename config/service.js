@@ -73,7 +73,7 @@ Service.getServerConfigItemList = async function ({appName = "", moduleName = ""
 		lastUser,
 		indexId,
 	});
-	let {__return, configRsq: {errMsg, configItemList}} = await DCacheOptPrx.getServerConfigItemList(option);
+	let {__return, configRsp: {errMsg, configItemList}} = await DCacheOptPrx.getServerConfigItemList(option);
 	console.log({__return, configItemList, errMsg});
 	assert(__return === 0, errMsg);
 	return configItemList;

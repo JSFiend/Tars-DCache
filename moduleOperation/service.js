@@ -7,6 +7,8 @@ const TarsStream = require("@tars/stream");
 
 const Dao = require('./dao.js');
 const ExpandServerDao = require('./expandServerDao');
+const serverConfigService = require('./../serverConfig/service.js');
+const applyService = require('./../apply/service.js');
 
 const service = {};
 
@@ -44,12 +46,36 @@ service.add = async function ({type, status, appName, moduleName, servers, cache
 };
 
 service.findOne = async function ({type, status, appName, moduleName, cache_version}) {
-  return await Dao.findOne({where: {type, status, appName, moduleName, cache_version}});
+  let where = {};
+  if (type) where.type = type;
+  if (status !== undefined) where.status = status;
+  if (appName) where.appName = appName;
+  if (moduleName) where.moduleName = moduleName;
+  if (cache_version) where.cache_version = cache_version;
+  return await Dao.findOne({where});
 };
+service.findAll = async function ({type, status, appName, moduleName, cache_version}) {
+  let where = {};
+  if (type) where.type = type;
+  if (status !== undefined) where.status = status;
+  if (appName) where.appName = appName;
+  if (moduleName) where.moduleName = moduleName;
+  if (cache_version) where.cache_version = cache_version;
+  return await Dao.findAll({where});
+};
+
+service.deleteOperation = async function ({appName, moduleName, type}) {
+  let where = {
+    appName,
+    moduleName,
+    type
+  }
+  return await Dao.destroy({where});
+}
 
 service.optExpandDCache = async function ({appName, moduleName, expandServers, cache_version, replace = false}) {
 
-  let cacheHost = expandServers.map ( item => {
+  let cacheHost = expandServers.map(item => {
     return {
       serverName: `DCache.${item.server_name}`,
       serverIp: item.server_ip,
@@ -75,7 +101,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
     version: '',
     replace,
   });
-  console.log(option, 'aaaaaa');
+  console.log('option', option.cacheHost.value);
   let {__return, expandRsp, expandRsp: {errMsg}} = await DCacheOptPrx.expandDCache(option);
   assert(__return === 0, errMsg);
   return expandRsp;
@@ -84,7 +110,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
 service.releaseServer = async function ({expandServers}) {
 
   let serverList = [];
-  expandServers.forEach( item => {
+  expandServers.forEach(item => {
     let releaseInfo = new DCacheOptStruct.ReleaseInfo();
     releaseInfo.readFromObject({
       appName: 'DCache',
@@ -108,6 +134,12 @@ service.releaseServer = async function ({expandServers}) {
   assert(__return === 0, errMsg);
   return releaseRsp;
 };
+
+service.putInServerConfig = async function ({appName, servers}) {
+  let apply = await applyService.findApplyByName({appName});
+  servers.forEach(item => item.apply_id = apply.id);
+  return await serverConfigService.addExpandServer(servers);
+}
 
 /**
  *
@@ -134,31 +166,29 @@ service.configTransfer = async function ({appName, moduleName, type = 1, srcGrou
   return rsp
 };
 /**
- *  0 require map<string, string> cond; // 查询条件
- *  1 require int index;                // 获取数据的索引(从0开始)
- *  2 require int number;               // 一次获取数据的个数(获取全部数据 number设置为-1)
- *  应用名: key为 appName, value为应用名
- *  模块名: key为 module, value为模块名
- *  迁移源组: key为src_group, value为源组名
- *  迁移目的组: key为dest_group, value为目的组名
- *  状态: key为 status， value: "0"为新增迁移任务，"1"为配置阶段完成，"2"为发布完成，"3"为正在迁移，"4"为完成，"5"为停止
- *  类型: key为 type, value: "0"为迁移,"1"为扩容,"2"为缩容,"3"为路由整理
- * 
+ * 查询路由变更(迁移，扩容，缩容)
+ * cond 查询条件: <"appName", "Test">表示查询应用名为Test的变更信息
+ *   map的key是TransferRecord中的成员: appName, moduleName, srcGroupName, dstGroupName, status, type
+ *   map的key都是字符串
+ *   status: "0"-新增迁移任务，"1"-配置阶段完成，"2"-发布完成，"3"-正在迁移，"4"-完成，5""-停止
+ *   type: "0"-迁移, "1"-扩容, "2"-缩容, "3"-路由整理
+ * index: 获取数据的索引(从0开始)
+ * number: 一次获取数据的个数(获取全部数据 number设置为-1)
  */
-service.getRouterChange = async function ( {
-  appName = '',
-  module = '',
-  src_group = '',
-  dest_group = '',
-  status = '',
-  type = '1',
-}) {
+service.getRouterChange = async function ({
+                                            appName = '',
+                                            moduleName = '',
+                                            srcGroupName = '',
+                                            dstGroupName = '',
+                                            status = '',
+                                            type = '1',
+                                          }) {
   let option = new DCacheOptStruct.RouterChangeReq();
   let cond = {};
   if (appName) cond.appName = appName;
-  if (module) cond.module= module;
-  if (src_group) cond.src_group = src_group;
-  if (dest_group) cond.dest_group = dest_group;
+  if (moduleName) cond.moduleName = modmoduleNameule;
+  if (srcGroupName) cond.srcGroupName = srcGroupName;
+  if (dstGroupName) cond.dstGroupName = dstGroupName;
   cond.type = type;
   option.readFromObject({
     index: 0,
@@ -170,6 +200,15 @@ service.getRouterChange = async function ( {
   return rsp
 };
 
+service.syncOperation = async function ({appName, module, type, id}) {
+  let {totalNum, transferRecord} = await service.getRouterChange({appName, module, type});
+  if (totalNum === 0) return false;
+  let item = transferRecord[0];
+  // 4、5 完成、停止
+  if (item.status <= 3) return false;
+  Dao.update({where: {id}, values: {status: '0'}})
+};
+
 /**
  * 缩容 opt 接口
  * 0 require string appName;
@@ -177,7 +216,7 @@ service.getRouterChange = async function ( {
  * 2 require vector<string> srcGroupName; // 源组组名
  *
  * */
-service.reduceDCache = async function ({appName='', moduleName='', srcGroupName=[]}) {
+service.reduceDCache = async function ({appName = '', moduleName = '', srcGroupName = []}) {
   let option = new DCacheOptStruct.ReduceReq();
   option.readFromObject({
     appName,
@@ -186,8 +225,12 @@ service.reduceDCache = async function ({appName='', moduleName='', srcGroupName=
   });
   let {__return, reduceRsp, reduceRsp: {errMsg}} = await DCacheOptPrx.reduceDCache(option);
   assert(__return === 0, errMsg);
-  return reduceRsp;
-}
+  let configTransferRsp = await service.configTransfer({appName, moduleName, type: 2, srcGroupName, dstGroupName: []});
+  return {
+    reduceRsp,
+    configTransferRsp,
+  };
+};
 
 /**
  * 停止迁移、扩容、缩容操作
@@ -196,18 +239,21 @@ service.reduceDCache = async function ({appName='', moduleName='', srcGroupName=
  * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
  * @srcGroupName 原组
  * @dstGroupName 目标组
- * 
+ *
  */
-service.stopTransfer = async function ({appName = '', moduleName ='', type = '1', srcGroupName = '', dstGroupName = ''}) {
+service.stopTransfer = async function ({appName = '', moduleName = '', type = '1', srcGroupName = '', dstGroupName = ''}) {
   let option = new DCacheOptStruct.StopTransferReq();
   option.readFromObject({
     appName,
     moduleName,
     type: '' + type,
     srcGroupName,
-    dstGroupName, 
+    dstGroupName,
   });
-  let {__return, rsp, rsp: {errMsg}} = await DCacheOptPrx.stopTransfer(option);
+  let res = await DCacheOptPrx.stopTransfer(option);
+  console.log('rsp', res);
+  console.log('rsp', res);
+  let {__return, rsp, rsp: {errMsg}} = res;
   assert(__return === 0, errMsg);
   return rsp;
 }
@@ -219,24 +265,23 @@ service.stopTransfer = async function ({appName = '', moduleName ='', type = '1'
  * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
  * @srcGroupName 原组
  * @dstGroupName 目标组
- * 
+ *
  */
-service.deleteTransfer = async function ({appName = '', moduleName ='', type = '1', srcGroupName = '', dstGroupName = ''}) {
+service.deleteTransfer = async function ({appName = '', moduleName = '', type = '1', srcGroupName = '', dstGroupName = ''}) {
   let option = new DCacheOptStruct.DeleteTransferReq();
   option.readFromObject({
     appName,
     moduleName,
     type: '' + type,
     srcGroupName,
-    dstGroupName, 
+    dstGroupName,
   });
   let res = await DCacheOptPrx.deleteTransfer(option);
-  console.log(res);
+  console.log('res', res);
   let {__return, rsp, rsp: {errMsg}} = res;
   assert(__return === 0, errMsg);
   return rsp;
 }
-
 
 
 module.exports = service;

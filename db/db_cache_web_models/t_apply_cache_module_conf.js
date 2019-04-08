@@ -42,7 +42,7 @@ module.exports = function (sequelize, DataTypes) {
 			allowNull: false,
 			defaultValue: '',
 			get () {
-				return _.compact(this.getDataValue('set_area').split(','))
+				return _.compact(this.getDataValue('set_area')? this.getDataValue('set_area').split(',') : [])
 			},
 			set (val) {
 				return this.setDataValue('set_area', val.join(','))

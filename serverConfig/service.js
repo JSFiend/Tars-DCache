@@ -2,8 +2,46 @@ const serverConfigDao = require('./dao.js');
 
 const ServerConfigService = {};
 
-ServerConfigService.addServerConfig = async function (option) {
+let model = {
+  area: '',
+  apply_id: '',
+  module_name: '',
+  group_name: '',
+  server_name: '',
+  server_ip: '',
+  server_type: '',
+  memory: '',
+  shmKey: '',
+  idc_area: '',
+  status: '',
+  modify_person: 'adminUser',
+  modify_time: '',
+  is_docker: ''
+}
+ServerConfigService.addServerConfig = async function (option = []) {
 	return await serverConfigDao.add(option);
+};
+
+ServerConfigService.addExpandServer = async function (expandServer) {
+  let option = expandServer.map(item => {
+    return  {
+      area: item.area,
+      apply_id: item.apply_id,
+      module_name: item.module_name,
+      group_name: item.group_name,
+      server_name: item.server_name,
+      server_ip: item.server_ip,
+      server_type: item.server_type,
+      memory: item.memory,
+      shmKey: item.shmKey,
+      idc_area: item.idc_area,
+      status: 0,
+      modify_person: item.modify_person,
+      modify_time: item.modify_time,
+      is_docker: item.is_docker,
+    }
+  });
+  return await serverConfigDao.add(option);
 };
 
 ServerConfigService.getServerConfigInfo = async function ({moduleId}) {

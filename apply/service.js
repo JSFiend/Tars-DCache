@@ -63,6 +63,10 @@ ApplyService.getApply = async function ({applyId, queryRouter, queryProxy}) {
 	return await ApplyDao.findOne({where: {id: +applyId}, queryRouter, queryProxy});
 };
 
+ApplyService.findApplyByName = async function ({appName}) {
+  return await ApplyDao.findOne({where: {name: appName}})
+}
+
 ApplyService.getApplyList = async function (options = {}) {
 	return await ApplyDao.findAll(options)
 };
