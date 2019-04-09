@@ -269,24 +269,8 @@ const ModuleConfigController = {
 	 */
 	getReleaseProgress: async (ctx) => {
 		try {
-			let {releaseId} = ctx.paramsObj;
-			let moduleReleaseProgressReq = new DCacheOptStruct.ReleaseProgressReq();
-			moduleReleaseProgressReq.readFromObject({releaseId});
-			let moduleProgressRsp = await DCacheOptPrx.getReleaseProgress(moduleReleaseProgressReq);
-			if (moduleProgressRsp.__return !== 0) {
-				// 获取进度失败
-				throw new Error(moduleProgressRsp.progressRsp.errMsg)
-			}
-			let progress = [];
-			let percent = moduleProgressRsp.progressRsp.percent;
-			moduleProgressRsp.progressRsp.releaseInfo.forEach(item => {
-				progress.push({
-					serverName: item.serverName,
-					nodeName: item.nodeName,
-					releaseId: moduleProgressRsp.progressRsp.releaseId,
-					percent
-				});
-			});
+			const {releaseId} = ctx.paramsObj;
+			const {progress, percent} = await ModuleConfigService.getReleaseProgress(releaseId);
 			ctx.makeResObj(200, '', {progress, percent});
 		} catch (err) {
 			logger.error('[getReleaseProgress]:', err);

@@ -23,7 +23,7 @@ const Controller = {
     let replace = true;
 
     try {
-      let {appName, moduleName, type, status, servers, cache_version} = ctx.paramsObj;
+      let {appName, moduleName, type, status, servers, cache_version, srcGroupName, dstGroupName} = ctx.paramsObj;
 
       // 是否有扩容的记录没有完成
       let operationRecord = await Service.findOne({type, appName, moduleName, cache_version, status: {[Op.not]: "0"}});
@@ -37,14 +37,17 @@ const Controller = {
 
       // 扩容服务入库 opt
       let expandServers = operationRecord.get('expandServers');
-      let args = await Service.optExpandDCache({appName, moduleName, expandServers, cache_version, replace,});
+      let args = await Service.optExpandDCache({appName, moduleName, expandServers, cache_version, replace});
 
       // 扩容服务入库 opt 后， 发布服务
       let expandRsq = await Service.releaseServer({expandServers});
 
       // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
       let serverConfig = await Service.putInServerConfig({appName, servers});
-      ctx.makeResObj(200, '', expandRsq)
+      ctx.makeResObj(200, '', expandRsq);
+
+      const { releaseId } = expandRsq;
+      await Service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName);
     } catch (err) {
 
       logger.error('[module operation expend]:', err);
@@ -72,7 +75,6 @@ const Controller = {
       let rsp = await Service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-
       logger.error('[module operation configTransfer]:', err);
       console.error(err);
       ctx.makeResObj(500, err.message)

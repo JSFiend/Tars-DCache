@@ -1,6 +1,8 @@
 let cwd = process.cwd();
 let path = require('path');
+const assert = require('assert');
 
+const {DCacheOptPrx, DCacheOptStruct, client} = require(path.join(cwd, './app/service/util/rpcClient'));
 const moduleConfigDao = require('./dao.js');
 const moduleDao = require('./../module/dao.js');
 const serverConfigDao = require('./../serverConfig/dao.js');
@@ -45,6 +47,24 @@ ModuleConfigService.removeModuleConfig = async function ({module_name, module_id
 
 ModuleConfigService.findOne = async function ({...where}) {
 	return moduleConfigDao.findOne({where: {status: 2, ...where}});
+};
+
+ModuleConfigService.getReleaseProgress = async function (releaseId) {
+	let moduleReleaseProgressReq = new DCacheOptStruct.ReleaseProgressReq();
+	moduleReleaseProgressReq.readFromObject({releaseId});
+	let {__return, progressRsp, progressRsp: {errMsg}} = await DCacheOptPrx.getReleaseProgress(moduleReleaseProgressReq);
+	assert(__return === 0, errMsg);
+	let progress = [];
+	let percent = progressRsp.percent;
+	progressRsp.releaseInfo.forEach(item => {
+		progress.push({
+			serverName: item.serverName,
+			nodeName: item.nodeName,
+			releaseId: progressRsp.releaseId,
+			percent
+		});
+	});
+	return {progress, percent};
 };
 
 module.exports = ModuleConfigService;

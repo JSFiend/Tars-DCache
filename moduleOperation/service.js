@@ -9,6 +9,7 @@ const Dao = require('./dao.js');
 const ExpandServerDao = require('./expandServerDao');
 const serverConfigService = require('./../serverConfig/service.js');
 const applyService = require('./../apply/service.js');
+const ModuleConfigService = require('../moduleConfig/service');
 
 const service = {};
 
@@ -75,7 +76,8 @@ service.deleteOperation = async function ({appName, moduleName, type}) {
 
 service.optExpandDCache = async function ({appName, moduleName, expandServers, cache_version, replace = false}) {
 
-  let cacheHost = expandServers.map(item => {
+  let cacheHost = expandServers.map(server => {
+    const item = server.dataValues;
     return {
       serverName: `DCache.${item.server_name}`,
       serverIp: item.server_ip,
@@ -101,7 +103,6 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
     version: '',
     replace,
   });
-  console.log('option', option.cacheHost.value);
   let {__return, expandRsp, expandRsp: {errMsg}} = await DCacheOptPrx.expandDCache(option);
   assert(__return === 0, errMsg);
   return expandRsp;
@@ -283,5 +284,15 @@ service.deleteTransfer = async function ({appName = '', moduleName = '', type = 
   return rsp;
 }
 
+service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName) {
+  const {progress, percent} = await ModuleConfigService.getReleaseProgress(releaseId);
+  let timer;
+  if (+percent !== 100) {
+    timer = setInterval(function() {service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName)}, 1000)
+  } else {
+    if (timer) clearInterval(timer);
+    const rsp = await service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+  }
+};
 
 module.exports = service;
