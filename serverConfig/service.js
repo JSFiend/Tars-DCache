@@ -60,5 +60,13 @@ ServerConfigService.findByApplyId = async function ({applyId}) {
 	return await serverConfigDao.findOne({where: {apply_id: applyId}});
 };
 
+ServerConfigService.findOne = async function ({where}) {
+  return await serverConfigDao.findOne({where});
+};
+
+ServerConfigService.update = async function ({where = {}, values = {}}) {
+  return await serverConfigDao.update({where, values});
+};
+
 
 module.exports = ServerConfigService;

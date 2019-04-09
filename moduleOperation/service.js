@@ -83,7 +83,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
       serverIp: item.server_ip,
       templateFile: 'tars.default',
       type: item.server_type ? 'S' : 'M',
-      bakSrcServerName: item.server_type ? `DCache.${expandServers[0].server_name}` : '',
+      bakSrcServerName: item.server_type != '0' ? `DCache.${expandServers[0].server_name}` : '',
       idc: item.area,
       priority: item.server_type ? '2' : '1',
       groupName: item.group_name,
@@ -176,14 +176,7 @@ service.configTransfer = async function ({appName, moduleName, type = 1, srcGrou
  * index: 获取数据的索引(从0开始)
  * number: 一次获取数据的个数(获取全部数据 number设置为-1)
  */
-service.getRouterChange = async function ({
-                                            appName = '',
-                                            moduleName = '',
-                                            srcGroupName = '',
-                                            dstGroupName = '',
-                                            status = '',
-                                            type = '1',
-                                          }) {
+service.getRouterChange = async function ({appName = '', moduleName = '', srcGroupName = '', dstGroupName = '', status = '', type = '1',}) {
   let option = new DCacheOptStruct.RouterChangeReq();
   let cond = {};
   if (appName) cond.appName = appName;
@@ -282,7 +275,69 @@ service.deleteTransfer = async function ({appName = '', moduleName = '', type = 
   let {__return, rsp, rsp: {errMsg}} = res;
   assert(__return === 0, errMsg);
   return rsp;
-}
+};
+
+/**
+ * 主备切换
+ * 0 require string appName;
+ * 1 require string moduleName;
+ * 2 require string groupName;
+ * 3 optional bool forceSwitch; // 是否强制切换
+ * 4 optional int diffBinlogTime;
+ * @returns {Promise<void>}
+ */
+service.switchServer = async function ({appName, moduleName, groupName, forceSwitch = false, diffBinlogTime = 5}) {
+  let option = new DCacheOptStruct.SwitchReq();
+  option.readFromObject({appName, moduleName, groupName, forceSwitch, diffBinlogTime});
+  let {__return, rsp, rsp: {errMsg}} = await DCacheOptPrx.switchServer(option);
+  assert(__return === 0, errMsg);
+  return rsp;
+};
+
+// 主备切换
+service.switchMainBackup = async function ({appName, moduleName, groupName}) {
+  let main = await serverConfigService.findOne({where: {module_name: moduleName, group_name: groupName, server_type: 1}});
+  let backup = await serverConfigService.findOne({where: {module_name: moduleName, group_name: groupName, server_type: 0}});
+  return await Promise.all([
+    main.update({server_type: 0}),
+    backup.update({server_type: 1}),
+  ])
+};
+
+/*
+* 查询切换信息请求
+* cond 查询条件，<"appName", "Test">表示查询应用名为Test的切换信息，
+*   索引值为 SwitchRecord 中的成员: appName, moduleName, groupName, msterServer, slaveServer, mirrorIdc, masterMirror, slaveMirror, switchTime, switchType, switchResult, groupStatus,
+*   除switchTime外其它为字符串值，switchTime为时间范围，其条件格式为从小到大的时间且以"|"分隔:"2019-01-01 12:00:00|2019-01-01 13:00:00"
+*   switchType: "0"-主备切换，"1"-镜像主备切换，"2"-无镜像备机切换，"3"-备机不可读
+*   switchResult: "0"-正在切换, "1"-切换成功, "2"-未切换, "3"-切换失败
+*   groupStatus: "0"-标识读写, "1"-标识只读, "2"-镜像不可用
+* index: 获取数据的索引(从0开始)
+* number: 一次获取数据的个数(获取全部数据 number设置为-1)
+* struct SwitchInfoReq
+{
+  0 require map<string, string> cond;
+  1 require int index;
+  2 require int number;
+};
+*/
+service.getSwitchInfo = async function ({appName = '', moduleName = '', groupName = '', msterServer = '', slaveServer = '' }) {
+  let option = new DCacheOptStruct.SwitchInfoReq();
+  let cond = {};
+  if (appName) cond.appName = appName;
+  if (moduleName) cond.moduleName = moduleName;
+  if (groupName) cond.groupName = groupName;
+  if (msterServer) cond.msterServer = msterServer;
+  if (slaveServer) cond.slaveServer = slaveServer;
+  option.readFromObject({
+    index: 0,
+    number: -1,
+    cond
+  });
+  let {__return, rsp, rsp: {errMsg, totalNum, switchRecord}} = await DCacheOptPrx.getSwitchInfo(option);
+  assert(__return === 0, errMsg);
+  return rsp
+};
 
 service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName) {
   const {progress, percent} = await ModuleConfigService.getReleaseProgress(releaseId);

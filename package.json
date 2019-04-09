@@ -1,6 +1,6 @@
 {
   "name": "@tencent/tars-dcache",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "description": "tars-dcache module",
   "main": "index.js",
   "scripts": {

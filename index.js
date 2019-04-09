@@ -92,11 +92,17 @@ let dcacheApiConf = [
   ['post', '/cache/deleteOperation', ModuleOperation.deleteOperation, {
     appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty'
   }],
+	['post', '/cache/switchServer', ModuleOperation.switchServer, {
+    appName: 'notEmpty', moduleName: 'notEmpty', groupName: 'notEmpty'
+  }],
   ['get', '/cache/hasOperation', ModuleOperation.hasOperation, {
     appName: 'notEmpty', moduleName: 'notEmpty'
   }],
   // 查询迁移管理
 	['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],
+	// 查询主备切换
+	['get', '/cache/getSwitchInfo', ModuleOperation.getSwitchInfo],
+
 
 	// cache 配置中心
 	['get', '/cache/getConfig', getConfig],

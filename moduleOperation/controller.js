@@ -179,8 +179,36 @@ const Controller = {
       console.error(err);
       ctx.makeResObj(500, err.message)
     }
-  }
-
+  },
+  /**
+   * 主备切换
+   */
+  async switchServer(ctx) {
+    try {
+      let {appName, moduleName, groupName} = ctx.paramsObj;
+      // opt 主备切换
+      let rsp = await Service.switchServer({appName, moduleName, groupName});
+      // 后台切换成功，前台数据库切换
+      rsp = await Service.switchMainBackup({appName, moduleName, groupName});
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
+  /**
+   * 查询主备切换
+   */
+  async getSwitchInfo(ctx) {
+    try {
+      let {appName, moduleName, groupName} = ctx.paramsObj;
+      let rsp = await Service.getSwitchInfo({appName, moduleName, groupName});
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
 };
 
 

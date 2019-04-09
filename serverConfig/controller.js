@@ -51,6 +51,7 @@ Object.assign(serverConfStruct, {
 	memory: '',
 	shmKey: '',
 	cache_version: '',
+	apply_id: '',
 });
 
 const ServerConfigController = {
@@ -59,7 +60,7 @@ const ServerConfigController = {
 			let {tree_node_id} = ctx.paramsObj;
 			let cacheServerList = await ServerConfigService.getCacheServerList({
 				moduleName: tree_node_id,
-				attributes: ['area', 'module_name', 'group_name', 'server_name', 'server_type', 'memory', 'shmKey', 'idc_area' ],
+				attributes: ['apply_id', 'area', 'module_name', 'group_name', 'server_name', 'server_type', 'memory', 'shmKey', 'idc_area' ],
 				queryBase: ['name'],
 				queryModule: ['cache_module_type']
 			});
@@ -86,6 +87,7 @@ const ServerConfigController = {
 				server.setDataValue('memory', cacheServer.get('memory'));
 				server.setDataValue('shmKey', cacheServer.get('shmKey'));
 				server.setDataValue('idc_area', cacheServer.get('idc_area'));
+				server.setDataValue('apply_id', cacheServer.get('apply_id'));
 				server.setDataValue('app_name', app_name);
 				server.setDataValue('cache_version', cache_version);
 			});
