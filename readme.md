@@ -1,5 +1,5 @@
 ## 介绍
-`@tencent/tars-dcache` 模块是依赖于 `tars` 管理平台上运行的 `dcache` 服务管理平台。
+`tars-dcache` 模块是依赖于 `tars` 管理平台上运行的 `dcache` 服务管理平台。
  
  ## 用法
  
@@ -21,8 +21,8 @@
    enableDcache: true
  }
  ```
- 2、安装 `@tencent/tars-dcache` 模块
- > npm install @tencent/tars-dcache --save
+ 2、安装 `tars-dcache` 模块
+ > npm install tars-dcache --save
  
  3、新建 `db_cache_web` 数据库， 并执行管理平台上的`db_cache_web.sql`脚本新建`Dcache`表。
  ```
