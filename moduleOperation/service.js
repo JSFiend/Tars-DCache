@@ -98,7 +98,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
       serverName: `DCache.${item.server_name}`,
       serverIp: item.server_ip,
       templateFile: 'tars.default',
-      type: item.server_type ? 'S' : 'M',
+      type: item.server_type != '0' ? 'S' : 'M',
       bakSrcServerName: item.server_type != '0' ? `DCache.${expandServers[0].server_name}` : '',
       idc: item.area,
       priority: item.server_type ? '2' : '1',
@@ -109,7 +109,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
       isContainer: item.is_docker.toString()
     }
   });
-
+  console.log('bbbbbbbbbbbbb', cacheHost);
   let option = new DCacheOptStruct.ExpandReq();
   option.readFromObject({
     appName,
