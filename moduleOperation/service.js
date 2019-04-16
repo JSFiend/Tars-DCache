@@ -18,7 +18,7 @@ const path = require('path');
 const assert = require('assert');
 let cwd = process.cwd();
 const {DCacheOptPrx, DCacheOptStruct, client} = require(path.join(cwd, './app/service/util/rpcClient'));
-
+const logger = require(path.join(cwd, './app/logger'));
 const TarsStream = require("@tars/stream");
 
 const Dao = require('./dao.js');
@@ -109,7 +109,7 @@ service.optExpandDCache = async function ({appName, moduleName, expandServers, c
       isContainer: item.is_docker.toString()
     }
   });
-  console.log('bbbbbbbbbbbbb', cacheHost);
+  console.log('cacheHost', cacheHost);
   let option = new DCacheOptStruct.ExpandReq();
   option.readFromObject({
     appName,
@@ -355,14 +355,19 @@ service.getSwitchInfo = async function ({appName = '', moduleName = '', groupNam
   return rsp
 };
 
+let timer = null;
 service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName) {
-  const {progress, percent} = await ModuleConfigService.getReleaseProgress(releaseId);
-  let timer;
-  if (+percent !== 100) {
-    timer = setInterval(function() {service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName)}, 1000)
-  } else {
-    if (timer) clearInterval(timer);
-    const rsp = await service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+  try {
+    const {progress, percent} = await ModuleConfigService.getReleaseProgress(releaseId);
+    if (+percent !== 100) {
+      timer = setTimeout(function() {service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName)}, 2000)
+    } else {
+      if (timer) clearInterval(timer);
+      const rsp = await service.configTransfer({appName, moduleName, type, srcGroupName, dstGroupName});
+    }
+  } catch (err) {
+    logger.error('[getReleaseProgress]:', err);
+    console.error(err);
   }
 };
 

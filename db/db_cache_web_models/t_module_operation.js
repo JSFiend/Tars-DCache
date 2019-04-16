@@ -23,11 +23,11 @@ module.exports = function (sequelize, DataTypes) {
 			autoIncrement: true
 		},
 		type: {
-			type: DataTypes.STRING(50),  //  expand 是扩容
+			type: DataTypes.STRING(50),  //  expand 是扩容, shrinkage 是缩容， migration 是迁移
 			allowNull: false,
 		},
 		status: {
-			type: DataTypes.STRING(50),   //  0  是 成功，  1、是开始， 2是进行中，
+			type: DataTypes.STRING(50),   //  0  是 成功，  1、是开始， 2是进行中(暂无使用)，
 			allowNull: false,
 		},
 		appName: {

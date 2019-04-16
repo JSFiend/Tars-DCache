@@ -42,7 +42,7 @@ let syncOperation = async function () {
   }
 }
 
-schedule.scheduleJob('0 * * * * *', syncOperation);
+schedule.scheduleJob('1 * * * * *', syncOperation);
 
 
 
