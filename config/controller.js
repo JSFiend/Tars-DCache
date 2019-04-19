@@ -39,7 +39,6 @@ const { getModuleConfigByName } = require('./../moduleConfig/service.js');
 
 
 const controller = {};
-sg
 controller.getConfig = async function (ctx) {
   try {
     const configList = await getConfig();
