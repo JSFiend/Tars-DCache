@@ -3,14 +3,14 @@
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
  *
- * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except 
+ * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  *
  * https://opensource.org/licenses/BSD-3-Clause
  *
- * Unless required by applicable law or agreed to in writing, software distributed 
- * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
- * CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 
@@ -18,25 +18,25 @@ const RegionDao = require('./dao');
 
 const RegionService = {};
 
-RegionService.getRegion = async function () {
-	return await RegionDao.getRegion({});
+RegionService.getRegion = function () {
+  return RegionDao.getRegion({});
 };
 
-RegionService.getRegionList = async function () {
-	return await RegionDao.getRegionList()
+RegionService.getRegionList = function () {
+  return RegionDao.getRegionList();
 };
 
-RegionService.addRegion = async function ({region, label}) {
-	return await RegionDao.addRegion({region, label})
+RegionService.addRegion = function ({ region, label }) {
+  return RegionDao.addRegion({ region, label });
 };
 
-RegionService.deleteRegion = async function ({id}) {
-	return await RegionDao.deleteRegion({id})
-}
+RegionService.deleteRegion = function ({ id }) {
+  return RegionDao.deleteRegion({ id });
+};
 
-RegionService.updateRegion = async function ({id, region, label}) {
-	return await RegionDao.updateRegion({id, region, label})
-}
+RegionService.updateRegion = function ({ id, region, label }) {
+  return RegionDao.updateRegion({ id, region, label });
+};
 
 
 module.exports = RegionService;
