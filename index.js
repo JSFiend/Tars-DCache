@@ -114,8 +114,16 @@ const dcacheApiConf = [
   ['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],
   // 查询主备切换
   ['get', '/cache/getSwitchInfo', ModuleOperation.getSwitchInfo],
-
-
+  // 恢复镜像状态
+  ['post', '/cache/recoverMirrorStatus', ModuleOperation.recoverMirrorStatus, {
+    appName: 'notEmpty', moduleName: 'notEmpty', groupName: 'notEmpty', mirrorIdc: 'notEmpty', dbFlag: 'notEmpty', enableErase: 'notEmpty',
+  }],
+  // 部署迁移
+  ['post', '/cache/transferDCache', ModuleOperation.transferDCache],
+  // 非部署迁移
+  ['post', '/cache/transferDCacheGroup', ModuleOperation.transferDCacheGroup, {
+    appName: 'notEmpty', moduleName: 'notEmpty', srcGroupName: 'notEmpty', dstGroupName: 'notEmpty', transferData: 'notEmpty',
+  }],
   // cache 配置中心
   ['get', '/cache/getConfig', getConfig],
   ['post', '/cache/addConfig', addConfig, {

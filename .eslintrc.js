@@ -24,6 +24,7 @@ module.exports = {
     }],
     "no-underscore-dangle": ["error", { "allow": ["__return"] }],
     "no-shadow": ["error", { "allow": ["path"] }],
-    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "object-curly-newline": 0
   },
 };

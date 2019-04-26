@@ -44,7 +44,7 @@ const Controller = {
 
       // 是否有扩容的记录没有完成
       const hasOperation = await Service.findOne({
-        appName, moduleName, type, status: { [Op.not]: '0' },
+        appName, moduleName, status: { [Op.not]: '0' },
       });
       if (hasOperation) throw new Error('#dcache.hasExpandOperation#');
 
@@ -73,6 +73,66 @@ const Controller = {
       ctx.makeResObj(200, '', expandRsq);
     } catch (err) {
       logger.error('[module operation expend]:', err);
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
+  /**
+   * 迁移
+   * @param ctx
+   * @returns {Promise<void>}
+   */
+  async transferDCache(ctx) {
+    let type = 'migration';
+    try {
+      const {
+        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
+      } = ctx.paramsObj;
+      logger.info({
+        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
+      });
+
+      // 是否有扩容的记录没有完成
+      const hasOperation = await Service.findOne({
+        appName, moduleName, status: { [Op.not]: '0' },
+      });
+      if (hasOperation) throw new Error('#dcache.hasMigrationOperation#');
+
+      // 没有就填加一条扩容记录
+      const operationRecord = await Service.add({
+        type, status, appName, moduleName, servers, cache_version,
+      });
+
+      // 扩容服务入库 opt
+      const expandServers = operationRecord.get('expandServers');
+      await Service.transferDCache({
+        appName, moduleName, servers: expandServers, cacheType: cache_version, srcGroupName,
+      });
+
+      // 扩容服务入库 opt 后， 发布服务
+      const expandRsq = await Service.releaseServer({ expandServers });
+
+      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
+      await Service.putInServerConfig({ appName, servers });
+
+      // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
+      // 前台数据库的 type 是 expand、shriankge、migration，  后台是 1、2、0
+      const { releaseId } = expandRsq;
+      Service.getReleaseProgress(releaseId, appName, moduleName, type = 0, [srcGroupName], [dstGroupName]);
+
+      ctx.makeResObj(200, '', expandRsq);
+    } catch (err) {
+      logger.error('[module operation migration]:', err);
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
+  async transferDCacheGroup(ctx) {
+    try {
+      const { appName, moduleName, srcGroupName, dstGroupName, transferData } = ctx.paramsObj;
+      const rsp = await Service.transferDCacheGroup({ appName, moduleName, srcGroupName, dstGroupName, transferData });
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
       console.error(err);
       ctx.makeResObj(500, err.message);
     }
@@ -241,7 +301,16 @@ const Controller = {
       console.error(err);
       ctx.makeResObj(500, err.message);
     }
-  }
-  ,
+  },
+  async recoverMirrorStatus(ctx) {
+    try {
+      const { appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase } = ctx.paramsObj;
+      const rsp = await Service.recoverMirrorStatus({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase });
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
 };
 module.exports = Controller;

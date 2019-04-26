@@ -168,16 +168,91 @@ service.putInServerConfig = async function ({ appName, servers }) {
 };
 
 /**
+ * 创建服务迁移
+ * @param TransferReq
+ * @returns {Promise<void>}
+ * struct TransferReq
+ *{
+ *   0 require string appName;
+ *   1 require string moduleName;
+ *   2 require string srcGroupName;
+ *   3 require vector<CacheHostParam> cacheHost;
+ *   4 require DCacheType cacheType;
+ *   5 require string version;
+ *   6 optional bool transferExisted=false; // 是否向已存在的服务迁移
+ *};
+ */
+service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType }) {
+  const cacheHost = servers.map((server) => {
+    const item = server.dataValues;
+    return {
+      serverName: `DCache.${item.server_name}`,
+      serverIp: item.server_ip,
+      templateFile: 'tars.default',
+      // 主机是 0，  传的 type 是 M
+      type: [0, '0'].includes(item.server_type) ? 'M' : 'S',
+      // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
+      bakSrcServerName: [0, '0'].includes(item.server_type) ? '' : `DCache.${servers[0].server_name}`,
+      idc: item.area,
+      priority: item.server_type ? '2' : '1',
+      groupName: item.group_name,
+      shmSize: item.memory.toString(),
+      // 共享内存key?
+      shmKey: item.shmKey,
+      isContainer: item.is_docker.toString(),
+    };
+  });
+  const option = new DCacheOptStruct.TransferReq();
+  option.readFromObject({
+    appName,
+    moduleName,
+    srcGroupName,
+    cacheHost,
+    cacheType,
+    version: '1.1.0',
+    transferExisted: false,
+  });
+  const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.transferDCache(option);
+  assert(__return === 0, errMsg);
+  return rsp;
+};
+
+/**
+ * // 向已存在的组迁移
+ * struct TransferGroupReq
+ * {
+ *    0 require string appName;
+ *    1 require string moduleName;
+ *    2 require string srcGroupName;  // 源组组名
+ *    3 require string dstGroupName;  // 目的组组名
+ *    4 require bool transferData;    // 是否迁移数据
+ * };
+ * @returns {Promise<void>}
+ */
+service.transferDCacheGroup = async function ({ appName, moduleName, srcGroupName, dstGroupName, transferData }) {
+  const option = { appName, moduleName, srcGroupName, dstGroupName, transferData };
+  const { __return, rsp, rep: { errMsg } } = await DCacheOptPrx.transferDCacheGroup(option);
+  assert(__return === 0, errMsg);
+  return rsp;
+};
+
+/**
  *
  * @param appName
  * @param moduleName
  * @param type // TRANSFER(0): 迁移， EXPAND(1): 扩容， REDUCE(2): 缩容
  * @param srcGroupName // 源组组名
  * @param dstGroupName // 目的组组名
+ * 0 require string appName;
+ * 1 require string moduleName;
+ * 2 require TransferType type; // TRANSFER(0): 迁移， EXPAND(1): 扩容， REDUCE(2): 缩容
+ * 3 optional vector<string> srcGroupName; // 源组组名
+ * 4 optional vector<string> dstGroupName; // 目的组组名
+ * 5 optional bool transferData=true;      // 是否迁移数据
  * @returns {Promise.<void>}
  */
 service.configTransfer = async function ({
-  appName, moduleName, type = 1, srcGroupName = [], dstGroupName = [],
+  appName, moduleName, type = 1, srcGroupName = [], dstGroupName = [], transferData = true,
 }) {
   const option = new DCacheOptStruct.ConfigTransferReq();
   option.readFromObject({
@@ -186,6 +261,7 @@ service.configTransfer = async function ({
     type,
     srcGroupName,
     dstGroupName,
+    transferData,
   });
 
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.configTransfer(option);
@@ -342,12 +418,48 @@ service.switchServer = async function ({
 
 // 主备切换
 service.switchMainBackup = async function ({ moduleName, groupName }) {
-  const main = await serverConfigService.findOne({ where: { module_name: moduleName, group_name: groupName, server_type: 1 } });
-  const backup = await serverConfigService.findOne({ where: { module_name: moduleName, group_name: groupName, server_type: 0 } });
+  const main = await serverConfigService.findOne({
+    where: {
+      module_name: moduleName,
+      group_name: groupName,
+      server_type: 1,
+    },
+  });
+  const backup = await serverConfigService.findOne({
+    where: {
+      module_name: moduleName,
+      group_name: groupName,
+      server_type: 0,
+    },
+  });
   return Promise.all([
     main.update({ server_type: 0 }),
     backup.update({ server_type: 1 }),
   ]);
+};
+
+/*
+* 发生镜像切换后，恢复镜像状态时使用
+* // 发生镜像切换后，恢复镜像状态时使用
+* struct RecoverMirrorReq
+* {
+*     0 require string appName;
+*     1 require string moduleName;
+*     2 require string groupName;
+*     3 require string mirrorIdc;
+*     4 require string dbFlag;        // 是否有DB
+*     5 require string enableErase;   // 是否使能淘汰
+* };
+*/
+service.recoverMirrorStatus = async function ({
+  appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase,
+}) {
+  const option = {
+    appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase,
+  };
+  const { __return, rsp: { errMsg } } = await DCacheOptPrx.recoverMirrorStatus(option);
+  assert(__return === 0, errMsg);
+  return true;
 };
 
 /*
@@ -388,15 +500,17 @@ service.getSwitchInfo = async function ({
 };
 
 let timer = null;
-service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName) {
+service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName, transferData) {
   try {
     const { percent } = await ModuleConfigService.getReleaseProgress(releaseId);
     if (+percent !== 100) {
-      timer = setTimeout(() => { service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName); }, 2000);
+      timer = setTimeout(() => {
+        service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName);
+      }, 2000);
     } else {
       if (timer) clearInterval(timer);
       await service.configTransfer({
-        appName, moduleName, type, srcGroupName, dstGroupName,
+        appName, moduleName, type, srcGroupName, dstGroupName, transferData,
       });
     }
   } catch (err) {
