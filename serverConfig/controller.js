@@ -67,7 +67,26 @@ Object.assign(serverConfStruct, {
 });
 
 const ServerConfigController = {
+  /**
+   * 获取 cache 服务列表
+   * @param ctx
+   * @returns {Promise<void>}
+   */
   async getCacheServerList(ctx) {
+    try {
+      const { appName, moduleName } = ctx.paramsObj;
+      // 从 opt 获取 cache 服务列表
+      const cacheServerList = await ServerConfigService.getCacheServerListFromOpt({ appName, moduleName });
+      const serverNameList = cacheServerList.map(server => `Dcache.${server.server_name}`);
+      // 用 cache 的服务名去读 tars 的服务
+      const serverList = await ServerService.getServerNameList({ applicationList: '', serverNameList, allAttr: true });
+      ctx.makeResObj(200, '', serverList);
+    } catch (err) {
+      logger.error('[getCacheServerList]:', err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
+  async getCacheServerListOld(ctx) {
     try {
       const { tree_node_id } = ctx.paramsObj;
       const cacheServerList = await ServerConfigService.getCacheServerList({

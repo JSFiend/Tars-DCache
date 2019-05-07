@@ -519,4 +519,30 @@ service.getReleaseProgress = async function (releaseId, appName, moduleName, typ
   }
 };
 
+/**
+ * 下线服务
+ * @returns {Promise<void>}
+ * struct UninstallReq
+ * {
+ *    0 require UninstallType unType;     //下线类型,0为单个Cache服务 1为按服务组,2为按模块,3为配额单服务下线
+ *    1 require string appName;
+ *    2 require string moduleName;        //模块名
+ *    3 optional string serverName;       //cache服务名, 当unType!=0时可为空
+ *    4 optional string groupName;        //cache服务组名, 当unType!=1时可为空
+ * };
+ */
+service.uninstall4DCache = async function ({ unType = 0, appName, moduleName, serverName, groupName = '' }) {
+  const option = new DCacheOptStruct.UninstallReq();
+  option.readFromObject({
+    unType,
+    appName,
+    moduleName,
+    serverName,
+    groupName,
+  });
+  const { __return, uninstallRsp, uninstallRsp: { errMsg } } = await DCacheOptPrx.uninstall4DCache(option);
+  assert(__return === 0, errMsg);
+  return uninstallRsp;
+};
+
 module.exports = service;

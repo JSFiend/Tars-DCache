@@ -13,16 +13,35 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
+const path = require('path');
+const assert = require('assert');
 
-const serverConfigDao = require('./dao.js');
+const cwd = process.cwd();
+const { DCacheOptPrx, DCacheOptStruct } = require(path.join(cwd, './app/service/util/rpcClient'));
+const Dao = require('./dao.js');
 
-const ServerConfigService = {};
+const Service = {};
 
-ServerConfigService.addServerConfig = function (option = []) {
-  return serverConfigDao.add(option);
+/**
+ * 从 opt 获取 cache 服务列表
+ * @param appName
+ * @param moduleName
+ * @returns {Promise<void>}  [{"serverName": "TestSwitchKVCacheServer1-1","serverIp": "100.117.137.106","serverType": "M"}, ....]
+ * serverType; // M-主机, S-备机, I-镜像
+ */
+Service.getCacheServerListFromOpt = async function ({ appName, moduleName }) {
+  const option = new DCacheOptStruct.CacheServerListReq();
+  option.readFromObject({ appName, moduleName });
+  const { __return, rsp: { errMsg, cacheServerList } } = await DCacheOptPrx.getCacheServerList(option);
+  assert(__return === 0, errMsg);
+  return cacheServerList;
 };
 
-ServerConfigService.addExpandServer = function (expandServer) {
+Service.addServerConfig = function (option = []) {
+  return Dao.add(option);
+};
+
+Service.addExpandServer = function (expandServer) {
   const option = expandServer.map(item => ({
     area: item.area,
     apply_id: item.apply_id,
@@ -39,34 +58,34 @@ ServerConfigService.addExpandServer = function (expandServer) {
     modify_time: item.modify_time,
     is_docker: item.is_docker,
   }));
-  return serverConfigDao.add(option);
+  return Dao.add(option);
 };
 
-ServerConfigService.getServerConfigInfo = function ({ moduleId }) {
-  return serverConfigDao.findOne({ where: { module_id: moduleId } });
+Service.getServerConfigInfo = function ({ moduleId }) {
+  return Dao.findOne({ where: { module_id: moduleId } });
 };
 
-ServerConfigService.getCacheServerList = function ({
+Service.getCacheServerList = function ({
   moduleName, attributes = [], queryBase = [], queryModule = [],
 }) {
-  return serverConfigDao.findAll({
+  return Dao.findAll({
     where: { module_name: moduleName }, attributes, queryBase, queryModule,
   });
 };
-ServerConfigService.removeServer = function ({ server_name }) {
-  return serverConfigDao.destroy({ where: { server_name } });
+Service.removeServer = function ({ server_name }) {
+  return Dao.destroy({ where: { server_name } });
 };
 
-ServerConfigService.findByApplyId = function ({ applyId }) {
-  return serverConfigDao.findOne({ where: { apply_id: applyId } });
+Service.findByApplyId = function ({ applyId }) {
+  return Dao.findOne({ where: { apply_id: applyId } });
 };
 
-ServerConfigService.findOne = function ({ where }) {
-  return serverConfigDao.findOne({ where });
+Service.findOne = function ({ where }) {
+  return Dao.findOne({ where });
 };
 
-ServerConfigService.update = function ({ where = {}, values = {} }) {
-  return serverConfigDao.update({ where, values });
+Service.update = function ({ where = {}, values = {} }) {
+  return Dao.update({ where, values });
 };
 
-module.exports = ServerConfigService;
+module.exports = Service;

@@ -1,6 +1,6 @@
 {
-  "name": "tars-dcache",
-  "version": "1.1.8",
+  "name": "@tencent/tars-dcache",
+  "version": "1.1.9",
   "description": "tars-dcache module",
   "main": "index.js",
   "scripts": {
@@ -8,10 +8,14 @@
     "lint-fix": "eslint --fix --ext .js ./",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
   },
-  "pre-commit": [ "precommit-msg", "lint" ],
+  "pre-commit": [
+    "precommit-msg",
+    "lint"
+  ],
   "author": "",
   "dependencies": {
     "@tars/stream": "^2.0.1",
+    "@tars/utils": "^2.0.0",
     "fs-extra": "^7.0.1",
     "lodash": "^4.17.11",
     "mysql": "^2.16.0",

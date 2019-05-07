@@ -312,5 +312,24 @@ const Controller = {
       ctx.makeResObj(500, err.message);
     }
   },
+  /**
+   * 下线 cache 服务，
+   * 后台没有提供批量下线 cache 服务的接口，自己多次请求
+   * @param ctx
+   * @returns {Promise<void>}
+   */
+  async uninstall4DCache(ctx) {
+    try {
+      const { appName, moduleName, serverNames } = ctx.paramsObj;
+      const result = [];
+      // return ctx.makeResObj(200, '', { a: 1, params: ctx.paramsObj });
+      serverNames.forEach(serverName => result.push(Service.uninstall4DCache({ appName, moduleName, serverName })));
+      const rsp = await Promise.all(result);
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
 };
 module.exports = Controller;

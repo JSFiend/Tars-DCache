@@ -30,6 +30,7 @@ const ServerConfigController = require('./serverConfig/controller.js');
 const ProxyController = require('./proxy/controller.js');
 const RouterController = require('./router/controller.js');
 const ModuleOperation = require('./moduleOperation/controller');
+const PropertyServer = require('./propertyServer/controller');
 
 const {
   getConfig,
@@ -82,7 +83,7 @@ const dcacheApiConf = [
   ['post', '/add_server_config', ServerConfigController.addServerConfig],
   ['get', '/module_install_and_publish', ModuleConfigController.installAndPublish],
   ['get', '/get_module_release_progress', ModuleConfigController.getReleaseProgress],
-  ['get', '/get_cache_server_list', ServerConfigController.getCacheServerList],
+  ['get', '/get_cache_server_list', ServerConfigController.getCacheServerListOld],
   ['post', '/cache/removeServer', ServerConfigController.removeServer],
   ['get', '/cache/getModuleStruct', ModuleController.getModuleStruct],
   ['get', '/cache/getReleaseProgress', ModuleConfigController.getReleaseProgress],
@@ -110,6 +111,8 @@ const dcacheApiConf = [
   ['get', '/cache/hasOperation', ModuleOperation.hasOperation, {
     appName: 'notEmpty', moduleName: 'notEmpty',
   }],
+  // 获取cache 服务列表
+  ['get', '/cache/getCacheServerList', ServerConfigController.getCacheServerList, { appName: 'notEmpty', moduleName: 'notEmpty' }],
   // 查询迁移管理
   ['get', '/cache/getRouterChange', ModuleOperation.getRouterChange],
   // 查询主备切换
@@ -124,6 +127,12 @@ const dcacheApiConf = [
   ['post', '/cache/transferDCacheGroup', ModuleOperation.transferDCacheGroup, {
     appName: 'notEmpty', moduleName: 'notEmpty', srcGroupName: 'notEmpty', dstGroupName: 'notEmpty', transferData: 'notEmpty',
   }],
+  // 下线 cache 服务
+  ['post', '/cache/uninstall4DCache', ModuleOperation.uninstall4DCache, {
+    appName: 'notEmpty', moduleName: 'notEmpty', serverNames: 'notEmpty',
+  }],
+  // 特性监控
+  ['get', '/cache/getMonitorData', PropertyServer.getMonitorData],
   // cache 配置中心
   ['get', '/cache/getConfig', getConfig],
   ['post', '/cache/addConfig', addConfig, {
