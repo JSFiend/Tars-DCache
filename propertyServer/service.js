@@ -16,7 +16,7 @@
 
 const cwd = process.cwd();
 const path = require('path');
-const Config = require('@tars/utils').Config;
+const { Config } = require('@tars/utils');
 
 const ConfigService = require(path.join(cwd, './app/service/config/ConfigService.js'));
 const Service = {};
