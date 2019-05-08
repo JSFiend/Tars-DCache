@@ -96,28 +96,34 @@ service.deleteOperation = function ({ appName, moduleName, type }) {
   return Dao.destroy({ where });
 };
 
+/**
+ * 扩容服务
+ * @param appName
+ * @param moduleName
+ * @param expandServers
+ * @param cache_version
+ * @param replace
+ * @returns {Promise<void>}
+ */
 service.optExpandDCache = async function ({
   appName, moduleName, expandServers, cache_version, replace = false,
 }) {
-  const cacheHost = expandServers.map((server) => {
-    const item = server.dataValues;
-    return {
-      serverName: `DCache.${item.server_name}`,
-      serverIp: item.server_ip,
-      templateFile: 'tars.default',
-      // 主机是 0，  传的 type 是 M
-      type: [0, '0'].includes(item.server_type) ? 'M' : 'S',
-      // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
-      bakSrcServerName: [0, '0'].includes(item.server_type) ? '' : `DCache.${expandServers[0].server_name}`,
-      idc: item.area,
-      priority: item.server_type ? '2' : '1',
-      groupName: item.group_name,
-      shmSize: item.memory.toString(),
-      // 共享内存key?
-      shmKey: item.shmKey,
-      isContainer: item.is_docker.toString(),
-    };
-  });
+  const cacheHost = expandServers.map(item => ({
+    serverName: `DCache.${item.server_name}`,
+    serverIp: item.server_ip,
+    templateFile: 'tars.default',
+    // 主机是 0，  传的 type 是 M
+    type: [0, '0'].includes(item.server_type) ? 'M' : 'S',
+    // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
+    bakSrcServerName: [0, '0'].includes(item.server_type) ? '' : `DCache.${expandServers[0].server_name}`,
+    idc: item.area,
+    priority: item.server_type ? '2' : '1',
+    groupName: item.group_name,
+    shmSize: item.memory.toString(),
+    // 共享内存key?
+    shmKey: item.shmKey,
+    isContainer: (!!item.is_docker).toString(),
+  }));
   console.log('cacheHost', cacheHost);
   const option = new DCacheOptStruct.ExpandReq();
   option.readFromObject({
