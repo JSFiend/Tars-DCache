@@ -77,8 +77,8 @@ const ServerConfigController = {
       const { appName, moduleName } = ctx.paramsObj;
       // 从 opt 获取 cache 服务列表
       const cacheServerList = await ServerConfigService.getCacheServerListFromOpt({ appName, moduleName });
-      const serverNameList = cacheServerList.map(server => `Dcache.${server.server_name}`);
       // 用 cache 的服务名去读 tars 的服务
+      const serverNameList = cacheServerList.map(server => `Dcache.${server.serverName}`);
       const serverList = await ServerService.getServerNameList({ applicationList: '', serverNameList, allAttr: true });
       ctx.makeResObj(200, '', serverList);
     } catch (err) {

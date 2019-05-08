@@ -230,8 +230,9 @@ service.transferDCache = async function ({ appName, moduleName, srcGroupName, se
  * @returns {Promise<void>}
  */
 service.transferDCacheGroup = async function ({ appName, moduleName, srcGroupName, dstGroupName, transferData }) {
-  const option = { appName, moduleName, srcGroupName, dstGroupName, transferData };
-  const { __return, rsp, rep: { errMsg } } = await DCacheOptPrx.transferDCacheGroup(option);
+  const option = new DCacheOptStruct.TransferGroupReq();
+  option.readFromObject({ appName, moduleName, srcGroupName, dstGroupName, transferData });
+  const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.transferDCacheGroup(option);
   assert(__return === 0, errMsg);
   return rsp;
 };
