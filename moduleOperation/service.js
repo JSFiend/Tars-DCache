@@ -538,7 +538,7 @@ service.getReleaseProgress = async function (releaseId, appName, moduleName, typ
  *    4 optional string groupName;        //cache服务组名, 当unType!=1时可为空
  * };
  */
-service.uninstall4DCache = async function ({ unType = 0, appName, moduleName, serverName, groupName = '' }) {
+service.uninstall4DCache = async function ({ unType = 0, appName, moduleName, serverName = '', groupName = '' }) {
   const option = new DCacheOptStruct.UninstallReq();
   option.readFromObject({
     unType,

@@ -311,11 +311,16 @@ const Controller = {
    */
   async uninstall4DCache(ctx) {
     try {
-      const { appName, moduleName, serverNames } = ctx.paramsObj;
-      const result = [];
-      // return ctx.makeResObj(200, '', { a: 1, params: ctx.paramsObj });
-      serverNames.forEach(serverName => result.push(Service.uninstall4DCache({ appName, moduleName, serverName })));
-      const rsp = await Promise.all(result);
+      const { unType, appName, moduleName, serverNames } = ctx.paramsObj;
+      let rsp;
+      if (unType) {
+        // 选中的服务有主机， 下线该模块所有的服务
+        rsp = await Service.uninstall4DCache({ unType, appName, moduleName });
+      } else {
+        const result = [];
+        serverNames.forEach(serverName => result.push(Service.uninstall4DCache({ unType, appName, moduleName, serverName })));
+        rsp = await Promise.all(result);
+      }
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       console.error(err);
