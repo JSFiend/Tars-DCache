@@ -20,11 +20,6 @@ const path = require('path');
 const logger = require(path.join(cwd, './app/logger'));
 
 
-const { Op } = require('sequelize');
-
-// 触发轮询任务
-require('./timeTask');
-
 const Service = require('./service.js');
 
 
@@ -42,7 +37,7 @@ const Controller = {
       });
 
       // 是否有扩容的记录没有完成
-      const { totalNum } = await Service.getRouterChange({ appName, moduleName, type: '1' });
+      const { totalNum } = await Service.getRouterChange({ appName, moduleName });
       if (totalNum > 0) throw new Error('#dcache.hasExpandOperation#');
 
       // 扩容服务入库 opt
@@ -74,42 +69,27 @@ const Controller = {
    * @returns {Promise<void>}
    */
   async transferDCache(ctx) {
-    let type = 'migration';
     try {
       const {
-        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
+        appName, moduleName, servers, cache_version, srcGroupName, dstGroupName,
       } = ctx.paramsObj;
-      logger.info({
-        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
-      });
-
       // 是否有扩容的记录没有完成
-      const hasOperation = await Service.findOne({
-        appName, moduleName, status: { [Op.not]: '0' },
-      });
-      if (hasOperation) throw new Error('#dcache.hasMigrationOperation#');
-
-      // 没有就填加一条扩容记录
-      const operationRecord = await Service.add({
-        type, status, appName, moduleName, servers, cache_version,
-      });
+      const { totalNum } = await Service.getRouterChange({ appName, moduleName });
+      if (totalNum > 0) throw new Error('#dcache.hasMigrationOperation#');
 
       // 扩容服务入库 opt
-      const expandServers = operationRecord.get('expandServers');
       await Service.transferDCache({
-        appName, moduleName, servers: expandServers, cacheType: cache_version, srcGroupName,
+        appName, moduleName, servers, cacheType: cache_version, srcGroupName,
       });
-
       // 扩容服务入库 opt 后， 发布服务
-      const expandRsq = await Service.releaseServer({ expandServers });
-
+      const expandRsq = await Service.releaseServer({ expandServers: servers });
       // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
       await Service.putInServerConfig({ appName, servers });
 
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
       // 前台数据库的 type 是 expand、shriankge、migration，  后台是 1、2、0
       const { releaseId } = expandRsq;
-      Service.getReleaseProgress(releaseId, appName, moduleName, type = 0, [srcGroupName], [dstGroupName]);
+      Service.getReleaseProgress(releaseId, appName, moduleName, 0, [srcGroupName], [dstGroupName]);
 
       ctx.makeResObj(200, '', expandRsq);
     } catch (err) {
@@ -254,10 +234,9 @@ const Controller = {
   async hasOperation(ctx) {
     try {
       const { appName, moduleName, type } = ctx.paramsObj;
-      const rsp = await Service.findOne({
-        appName, moduleName, type, status: { [Op.not]: '0' },
-      });
-      ctx.makeResObj(200, '', !!rsp);
+      // 是否有扩容的记录没有完成
+      const { totalNum } = await Service.getRouterChange({ appName, moduleName, type });
+      ctx.makeResObj(200, '', !!totalNum);
     } catch (err) {
       logger.error('has Operation:', err);
       console.error(err);

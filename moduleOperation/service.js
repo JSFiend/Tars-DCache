@@ -22,79 +22,11 @@ const { DCacheOptPrx, DCacheOptStruct } = require(path.join(cwd, './app/service/
 const logger = require(path.join(cwd, './app/logger'));
 const TarsStream = require('@tars/stream');
 
-const Dao = require('./dao.js');
-const ExpandServerDao = require('./expandServerDao');
 const serverConfigService = require('./../serverConfig/service.js');
 const applyService = require('./../apply/service.js');
 const ModuleConfigService = require('../moduleConfig/service');
 
 const service = {};
-
-service.add = async function ({
-  type, status, appName, moduleName, servers, cache_version,
-}) {
-  const operationRecord = await Dao.add({
-    type, status, appName, moduleName, servers, cache_version,
-  });
-
-  const preExpandServers = servers.map(item => ({
-    operation_id: operationRecord.get('id'),
-    area: item.area,
-    app_name: item.app_name,
-    module_name: item.module_name,
-    group_name: item.group_name,
-    server_name: item.server_name,
-    server_ip: item.server_ip,
-    server_type: item.server_type,
-    memory: item.memory,
-    shmKey: item.shmKey,
-    idc_area: item.idc_area,
-    status: 0,
-    modify_person: item.modify_person,
-    modify_time: item.modify_time,
-    is_docker: item.is_docker,
-    patch_version: item.patch_version,
-  }));
-
-  // 扩容数据入库
-  const expandServers = await ExpandServerDao.addList(preExpandServers);
-
-  operationRecord.setDataValue('expandServers', expandServers);
-
-  return operationRecord;
-};
-
-service.findOne = async function ({
-  type, status, appName, moduleName, cache_version,
-}) {
-  const where = {};
-  if (type) where.type = type;
-  if (status !== undefined) where.status = status;
-  if (appName) where.appName = appName;
-  if (moduleName) where.moduleName = moduleName;
-  if (cache_version) where.cache_version = cache_version;
-  return Dao.findOne({ where });
-};
-service.findAll = function ({
-  type, status, appName, moduleName, cache_version,
-}) {
-  const where = {};
-  if (type) where.type = type;
-  if (status !== undefined) where.status = status;
-  if (appName) where.appName = appName;
-  if (moduleName) where.moduleName = moduleName;
-  if (cache_version) where.cache_version = cache_version;
-  return Dao.findAll({ where });
-};
-
-service.deleteOperation = function ({ appName, moduleName, type }) {
-  const where = {
-    appName,
-    moduleName,
-    type,
-  };
-  return Dao.destroy({ where });
-};
 
 /**
  * 扩容服务
@@ -286,7 +218,7 @@ service.configTransfer = async function ({
  * number: 一次获取数据的个数(获取全部数据 number设置为-1)
  */
 service.getRouterChange = async function ({
-  appName = '', moduleName = '', srcGroupName = '', dstGroupName = '', status = '', type = '1',
+  appName = '', moduleName = '', srcGroupName = '', dstGroupName = '', status = '', type = '',
 }) {
   const option = new DCacheOptStruct.RouterChangeReq();
   const cond = {};
@@ -295,7 +227,8 @@ service.getRouterChange = async function ({
   if (status) cond.status = status;
   if (srcGroupName) cond.srcGroupName = srcGroupName;
   if (dstGroupName) cond.dstGroupName = dstGroupName;
-  cond.type = type;
+  if (type) cond.type = type;
+  // cond.type = type;
   option.readFromObject({
     index: 0,
     number: -1,
@@ -304,22 +237,6 @@ service.getRouterChange = async function ({
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.getRouterChange(option);
   assert(__return === 0, errMsg);
   return rsp;
-};
-
-service.syncOperation = async function ({
-  appName, module, type, id,
-}) {
-  try {
-    const { totalNum, transferRecord } = await service.getRouterChange({ appName, module, type });
-    if (totalNum === 0) return false;
-    const item = transferRecord[0];
-    // 4、5 完成、停止
-    if (item.status <= 3) return false;
-    return Dao.update({ where: { id }, values: { status: '0' } });
-  } catch (err) {
-    console.error(err);
-    throw new Error(err);
-  }
 };
 
 /**

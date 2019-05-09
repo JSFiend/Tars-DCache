@@ -96,10 +96,7 @@ controller.editConfig = async function (ctx) {
 
 controller.getModuleConfig = async function (ctx) {
   try {
-    const { moduleName } = ctx.paramsObj;
-    const moduleInfo = await getModuleConfigByName({ moduleName, queryAppBase: ['name', 'set_area'] });
-    assert(moduleInfo, '#cache.config.noModuleExist#');
-    const appName = moduleInfo.AppBase.name;
+    const { appName, moduleName } = ctx.paramsObj;
     const res = await getServerConfigItemList({ appName, moduleName });
     ctx.makeResObj(200, '', res);
   } catch (err) {

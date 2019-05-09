@@ -133,12 +133,5 @@ tApplyCacheServerConf.belongsTo(tApplyCacheModuleConf, {
   as: 'moduleBase',
 });
 
-const { tModuleOperation } = Db.db_cache_web;
-const { tExpandServer } = Db.db_cache_web;
-
-tModuleOperation.hasMany(tExpandServer, {
-  foreignKey: 'operation_id',
-  as: 'expandServers',
-});
 
 module.exports = Db;

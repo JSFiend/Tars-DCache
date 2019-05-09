@@ -26,13 +26,21 @@ const Service = {};
  * 从 opt 获取 cache 服务列表
  * @param appName
  * @param moduleName
- * @returns {Promise<void>}  [{"serverName": "TestSwitchKVCacheServer1-1","serverIp": "100.117.137.106","serverType": "M"}, ....]
+ * @returns {Promise<void>}
+ * struct CacheServerListRsp
+ * {
+ *    0 require string errMsg;
+ *    //1 require string moduleName;
+ *    1 require vector<CacheServerInfo> cacheServerList;
+ *    2 require DCacheType cacheType;
+ * };
  * serverType; // M-主机, S-备机, I-镜像
  */
 Service.getCacheServerListFromOpt = async function ({ appName, moduleName }) {
   const option = new DCacheOptStruct.CacheServerListReq();
   option.readFromObject({ appName, moduleName });
-  const { __return, rsp: { errMsg, cacheServerList } } = await DCacheOptPrx.getCacheServerList(option);
+  const { __return, rsp: { errMsg, cacheServerList, cacheType } } = await DCacheOptPrx.getCacheServerList(option);
+  cacheServerList.forEach(item => Object.assign(item, { appName, moduleName, cacheType }));
   assert(__return === 0, errMsg);
   return cacheServerList;
 };
