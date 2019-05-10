@@ -288,12 +288,12 @@ const Controller = {
     try {
       const { unType, appName, moduleName, serverNames } = ctx.paramsObj;
       let rsp;
-      if (unType) {
+      if (unType !== '0') {
         // 选中的服务有主机， 下线该模块所有的服务
-        rsp = await Service.uninstall4DCache({ unType, appName, moduleName });
+        rsp = await Service.uninstallModule4DCache({ unType, appName, moduleName });
       } else {
         const result = [];
-        serverNames.forEach(serverName => result.push(Service.uninstall4DCache({ unType, appName, moduleName, serverName })));
+        serverNames.forEach(serverName => result.push(Service.uninstallServer4DCache({ unType, appName, moduleName, serverName })));
         rsp = await Promise.all(result);
       }
       ctx.makeResObj(200, '', rsp);
