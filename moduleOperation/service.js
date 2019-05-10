@@ -455,7 +455,7 @@ service.getReleaseProgress = async function (releaseId, appName, moduleName, typ
  *    4 optional string groupName;        //cache服务组名, 当unType!=1时可为空
  * };
  */
-service.uninstall4DCache = async function ({ unType = 0, appName, moduleName, serverName = '', groupName = '' }) {
+service.uninstallModule4DCache = async function ({ unType = 2, appName, moduleName, serverName = '', groupName = '' }) {
   const option = new DCacheOptStruct.UninstallReq();
   option.readFromObject({
     unType,
@@ -466,6 +466,23 @@ service.uninstall4DCache = async function ({ unType = 0, appName, moduleName, se
   });
   const { __return, uninstallRsp, uninstallRsp: { errMsg } } = await DCacheOptPrx.uninstall4DCache(option);
   assert(__return === 0, errMsg);
+  const module = await ModuleConfigService.getModuleConfigByName({ moduleName });
+  await ModuleConfigService.removeModuleConfig({ module_name: moduleName, module_id: module.module_id });
+  return uninstallRsp;
+};
+
+service.uninstallServer4DCache = async function ({ unType = 0, appName, moduleName, serverName, groupName = '' }) {
+  const option = new DCacheOptStruct.UninstallReq();
+  option.readFromObject({
+    unType,
+    appName,
+    moduleName,
+    serverName,
+    groupName,
+  });
+  const { __return, uninstallRsp, uninstallRsp: { errMsg } } = await DCacheOptPrx.uninstall4DCache(option);
+  assert(__return === 0, errMsg);
+  await serverConfigService.removeServer({ server_name: serverName.replace('DCache.', '') });
   return uninstallRsp;
 };
 
