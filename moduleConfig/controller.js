@@ -285,7 +285,8 @@ const ModuleConfigController = {
         });
       } else {
         // 安装失败
-        throw new Error(args.mkvCacheRsp.errMsg);
+        const { errMsg } = args.kvCacheRsp || args.mkvCacheRsp;
+        throw new Error(errMsg);
       }
     } catch (err) {
       logger.error('[installAndPublish]:', err);
