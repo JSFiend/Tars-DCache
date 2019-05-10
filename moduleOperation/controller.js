@@ -191,18 +191,9 @@ const Controller = {
         appName, moduleName, type, srcGroupName, dstGroupName,
       } = ctx.paramsObj;
       // 删除 opt 记录
-      let rsp = await Service.deleteTransfer({
+      const rsp = await Service.deleteTransfer({
         appName, moduleName, type, srcGroupName, dstGroupName,
       });
-
-      // 删除dcache 操作记录
-      const operationType = {
-        0: 'migration',
-        1: 'expand',
-        2: 'shrinage',
-      };
-      rsp = await Service.deleteOperation({ appName, moduleName, type: operationType[type] });
-
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('stopTransfer:', err);
