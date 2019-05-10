@@ -40,16 +40,16 @@ const service = {};
 service.optExpandDCache = async function ({
   appName, moduleName, expandServers, cache_version, replace = false,
 }) {
+  const hostServer = expandServers.find(item => item.server_type === 'M');
   const cacheHost = expandServers.map(item => ({
     serverName: `DCache.${item.server_name}`,
     serverIp: item.server_ip,
     templateFile: 'tars.default',
-    // 主机是 0，  传的 type 是 M
-    type: [0, '0'].includes(item.server_type) ? 'M' : 'S',
+    type: item.server_type,
     // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
-    bakSrcServerName: [0, '0'].includes(item.server_type) ? '' : `DCache.${expandServers[0].server_name}`,
+    bakSrcServerName: item.server_type === 'M' ? '' : `DCache.${hostServer.server_name}`,
     idc: item.area,
-    priority: item.server_type ? '2' : '1',
+    priority: item.server_type === 'M' ? '1' : '2',
     groupName: item.group_name,
     shmSize: item.memory.toString(),
     // 共享内存key?
@@ -121,25 +121,22 @@ service.putInServerConfig = async function ({ appName, servers }) {
  *};
  */
 service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType }) {
-  const cacheHost = servers.map((server) => {
-    const item = server.dataValues;
-    return {
-      serverName: `DCache.${item.server_name}`,
-      serverIp: item.server_ip,
-      templateFile: 'tars.default',
-      // 主机是 0，  传的 type 是 M
-      type: [0, '0'].includes(item.server_type) ? 'M' : 'S',
-      // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
-      bakSrcServerName: [0, '0'].includes(item.server_type) ? '' : `DCache.${servers[0].server_name}`,
-      idc: item.area,
-      priority: item.server_type ? '2' : '1',
-      groupName: item.group_name,
-      shmSize: item.memory.toString(),
-      // 共享内存key?
-      shmKey: item.shmKey,
-      isContainer: item.is_docker.toString(),
-    };
-  });
+  const hostServer = servers.find(item => item.server_type === 'M');
+  const cacheHost = servers.map(item => ({
+    serverName: `DCache.${item.server_name}`,
+    serverIp: item.server_ip,
+    templateFile: 'tars.default',
+    type: item.server_type,
+    // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
+    bakSrcServerName: item.server_type === 'M' ? '' : `DCache.${hostServer.server_name}`,
+    idc: item.area,
+    priority: item.server_type === 'M' ? '1' : '2',
+    groupName: item.group_name,
+    shmSize: item.memory.toString(),
+    // 共享内存key?
+    shmKey: item.shmKey,
+    isContainer: item.is_docker.toString(),
+  }));
   const option = new DCacheOptStruct.TransferReq();
   option.readFromObject({
     appName,
