@@ -48,11 +48,13 @@ const Controller = {
       // 扩容服务入库 opt 后， 发布服务
       const expandRsq = await Service.releaseServer({ expandServers: servers });
 
-      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
-      await Service.putInServerConfig({ appName, servers });
+      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示， 后台服务类型用  MSI表示，前台用的是012， 分别是主备镜
+      const serverType = { M: 0, S: 1, I: 2 };
+      const frontDataBaseServers = servers.map(item => ({ ...item, server_type: serverType[item.server_type] }));
+      await Service.putInServerConfig({ appName, servers: frontDataBaseServers });
 
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
-      //  type  后台是 1、2、0
+      //  type  后台是 1、2、0, 扩容、缩容、迁移
       const { releaseId } = expandRsq;
       Service.getReleaseProgress(releaseId, appName, moduleName, 1, srcGroupName, dstGroupName);
 
@@ -83,8 +85,11 @@ const Controller = {
       });
       // 扩容服务入库 opt 后， 发布服务
       const expandRsq = await Service.releaseServer({ expandServers: servers });
-      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示
-      await Service.putInServerConfig({ appName, servers });
+
+      // 发布完成后， 需要入库 前台 dcache 数据库，才会在目录树显示， 后台服务类型用  MSI表示，前台用的是012， 分别是主备镜
+      const serverType = { M: 0, S: 1, I: 2 };
+      const frontDataBaseServers = servers.map(item => ({ ...item, server_type: serverType[item.server_type] }));
+      await Service.putInServerConfig({ appName, servers: frontDataBaseServers });
 
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
       // 前台数据库的 type 是 expand、shriankge、migration，  后台是 1、2、0
