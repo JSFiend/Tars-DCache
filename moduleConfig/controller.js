@@ -135,6 +135,8 @@ const ModuleConfigController = {
       });
       if (!defaultCachePackage) throw new Error('#module.noDefaultCachePackage#');
 
+      // 主机、镜像、备机
+      const optServerType = ['M', 'S', 'I'];
       ServerConf.forEach((item) => {
         // for install use
         const host = new DCacheOptStruct.CacheHostParam();
@@ -142,7 +144,7 @@ const ModuleConfigController = {
           serverName: `DCache.${item.server_name}`,
           serverIp: item.server_ip,
           templateFile: 'tars.default',
-          type: item.server_type ? 'S' : 'M',
+          type: optServerType[item.server_type],
           bakSrcServerName: item.server_type ? `DCache.${ServerConf[0].server_name}` : '',
           idc: item.area,
           priority: item.server_type ? '2' : '1',
