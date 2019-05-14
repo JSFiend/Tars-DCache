@@ -137,24 +137,13 @@ controller.getServerNodeConfig = async function (ctx) {
 
 controller.addServerConfigItem = async function (ctx) {
   try {
-    let {
-      appName, moduleName, serverName, nodeName, configValue, itemId,
-    } = ctx.paramsObj;
-    // 有moduleName 的是模块添加配置，  只有 serverName 和 nodeName 的是服务添加配置
-    if (moduleName) {
-      const moduleInfo = await getModuleConfigByName({ moduleName, queryAppBase: ['name', 'set_area'] });
-      assert(moduleInfo, '#cache.config.noModuleExist#');
-      appName = moduleInfo.AppBase.name;
-      nodeName = '';
-      serverName = '';
-    }
-    const res = await addServerConfigItem({
-      appName, moduleName, serverName, nodeName, configValue, itemId,
-    });
+    const { appName, moduleName, serverName, nodeName, configValue, itemId } = ctx.paramsObj;
+    // 有appName, moduleName 的是模块添加配置，  只有 serverName 和 nodeName 的是服务添加配置
+    const res = await addServerConfigItem({ appName, moduleName, serverName, nodeName, configValue, itemId });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[getServerNodeConfigItemList]: ', err);
-    logger.error('[getServerNodeConfigItemList]: ', err);
+    console.error('[addServerConfigItem]: ', err);
+    logger.error('[addServerConfigItem]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
 };

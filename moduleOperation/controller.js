@@ -29,16 +29,13 @@ const Controller = {
      */
   async expandDCache(ctx) {
     try {
-      const {
-        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
-      } = ctx.paramsObj;
-      logger.info({
-        appName, moduleName, status, servers, cache_version, srcGroupName, dstGroupName,
-      });
+      const { appName, moduleName, status, servers, cache_version, srcGroupName } = ctx.paramsObj;
+      logger.info({ appName, moduleName, status, servers, cache_version, srcGroupName });
 
       // 是否有扩容的记录没有完成
-      const { totalNum } = await Service.getRouterChange({ appName, moduleName });
-      if (totalNum > 0) throw new Error('#dcache.hasExpandOperation#');
+      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
+      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      if (has) throw new Error('#dcache.hasExpandOperation#');
 
       // 扩容服务入库 opt
       await Service.optExpandDCache({
@@ -56,6 +53,7 @@ const Controller = {
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
       //  type  后台是 1、2、0, 扩容、缩容、迁移
       const { releaseId } = expandRsq;
+      const dstGroupName = Array.from(new Set(servers.map(item => item.group_name)));
       Service.getReleaseProgress(releaseId, appName, moduleName, 1, srcGroupName, dstGroupName);
 
       ctx.makeResObj(200, '', expandRsq);
@@ -231,8 +229,9 @@ const Controller = {
     try {
       const { appName, moduleName, type } = ctx.paramsObj;
       // 是否有扩容的记录没有完成
-      const { totalNum } = await Service.getRouterChange({ appName, moduleName, type });
-      ctx.makeResObj(200, '', !!totalNum);
+      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName, type });
+      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      ctx.makeResObj(200, '', !!has);
     } catch (err) {
       logger.error('has Operation:', err);
       console.error(err);

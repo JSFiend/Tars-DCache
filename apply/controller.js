@@ -314,42 +314,6 @@ const ApplyController = {
       ctx.makeResObj(500, err.message);
     }
   },
-  /**
-  * 获取发布进度
-  * @param ctx
-  * @returns {Promise.<void>}
-  */
-  getReleaseProgress: async (ctx) => {
-    try {
-      const { proxyReleaseId, routerReleaseId } = ctx.paramsObj;
-      const ProxyReleaseProgressReq = new DCacheOptStruct.ReleaseProgressReq();
-      const RouterReleaseProgressReq = new DCacheOptStruct.ReleaseProgressReq();
-      ProxyReleaseProgressReq.readFromObject({ releaseId: proxyReleaseId });
-      RouterReleaseProgressReq.readFromObject({ releaseId: routerReleaseId });
-      const proxyProgressRsp = await DCacheOptPrx.getReleaseProgress(ProxyReleaseProgressReq);
-      const routerProgressRsp = await DCacheOptPrx.getReleaseProgress(RouterReleaseProgressReq);
-      if (proxyProgressRsp.__return !== 0 || routerProgressRsp.__return !== 0) {
-        // 获取进度失败
-        throw new Error(proxyProgressRsp.progressRsp.errMsg);
-      }
-      const progress = [];
-      progress.push({
-        module: 'ProxyServer',
-        releaseId: proxyProgressRsp.progressRsp.releaseId,
-        percent: proxyProgressRsp.progressRsp.percent,
-      });
-      progress.push({
-        module: 'RouterServer',
-        releaseId: routerProgressRsp.progressRsp.releaseId,
-        percent: routerProgressRsp.progressRsp.percent,
-      });
-      // ctx.makeResObj(200, '', {proxyProgressRsp, routerProgressRsp});
-      ctx.makeResObj(200, '', { progress });
-    } catch (err) {
-      logger.error('[getReleaseProgress]:', err);
-      ctx.makeResObj(500, err.message);
-    }
-  },
   getApplyAndRouterAndProxy: async (ctx) => {
     try {
       const { applyId } = ctx.paramsObj;

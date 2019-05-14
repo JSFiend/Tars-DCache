@@ -63,8 +63,7 @@ const dcacheApiConf = [
   ['get', '/get_apply_and_router_and_proxy', ApplyController.getApplyAndRouterAndProxy],
   ['post', '/save_router_proxy', ApplyController.saveRouterProxy],
   ['get', '/get_apply_list', ApplyController.getApplyList],
-  ['get', '/install_and_publish', ApplyController.installAndPublish],
-  ['get', '/get_release_progress', ApplyController.getReleaseProgress],
+  ['get', '/cache/install_and_publish', ApplyController.installAndPublish],
   ['get', '/cache/hasModule', ApplyController.hasModule],
   ['get', '/cache/getPublishSuccessModuleConfig', ApplyController.getPublishSuccessModuleConfig],
 
