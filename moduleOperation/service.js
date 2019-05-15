@@ -282,8 +282,32 @@ service.stopTransfer = async function ({
     dstGroupName,
   });
   const res = await DCacheOptPrx.stopTransfer(option);
-  console.log('rsp', res);
-  console.log('rsp', res);
+  const { __return, rsp, rsp: { errMsg } } = res;
+  assert(__return === 0, errMsg);
+  return rsp;
+};
+
+/**
+ * 重试迁移、扩容、缩容操作
+ * @appName     应用名
+ * @moduleName  模块名
+ * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
+ * @srcGroupName 原组
+ * @dstGroupName 目标组
+ *
+ */
+service.restartTransfer = async function ({
+  appName = '', moduleName = '', type = '1', srcGroupName = '', dstGroupName = '',
+}) {
+  const option = new DCacheOptStruct.RestartTransferReq();
+  option.readFromObject({
+    appName,
+    moduleName,
+    type: `${type}`,
+    srcGroupName,
+    dstGroupName,
+  });
+  const res = await DCacheOptPrx.restartTransfer(option);
   const { __return, rsp, rsp: { errMsg } } = res;
   assert(__return === 0, errMsg);
   return rsp;
