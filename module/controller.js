@@ -25,6 +25,27 @@ const ModuleService = require('./service.js');
 
 
 const ModuleController = {
+  async queryProperptyData(ctx) {
+    try {
+      const { thedate, predate, startshowtime, endshowtime, moduleName, serverName } = ctx.paramsObj;
+      console.log(ctx.paramsObj);
+      // ctx.makeResObj(200, '', ctx.paramsObj);
+      // return;
+      const option = {
+        moduleName,
+        serverName,
+        date: [thedate, predate],
+        startTime: startshowtime,
+        endTime: endshowtime,
+      };
+      const rsp = await ModuleService.queryProperptyData(option);
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error('queryProperptyData', err);
+      logger.error('[queryProperptyData]:', err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
   async addModuleBaseInfo(ctx) {
     try {
       const {
@@ -41,7 +62,7 @@ const ModuleController = {
       ctx.makeResObj(200, '', item);
     } catch (err) {
       logger.error('[addModuleBaseInfo]:', err);
-      ctx.makeErrResObj();
+      ctx.makeResObj(500, err.message);
     }
   },
   async getModuleInfo(ctx) {

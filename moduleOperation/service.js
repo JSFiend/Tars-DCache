@@ -120,7 +120,7 @@ service.putInServerConfig = async function ({ appName, servers }) {
  *   6 optional bool transferExisted=false; // 是否向已存在的服务迁移
  *};
  */
-service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType }) {
+service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType, transferExisted = false }) {
   const hostServer = servers.find(item => item.server_type === 'M');
   const cacheHost = servers.map(item => ({
     serverName: `DCache.${item.server_name}`,
@@ -145,7 +145,7 @@ service.transferDCache = async function ({ appName, moduleName, srcGroupName, se
     cacheHost,
     cacheType,
     version: '1.1.0',
-    transferExisted: false,
+    transferExisted,
   });
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.transferDCache(option);
   assert(__return === 0, errMsg);

@@ -76,6 +76,9 @@ const dcacheApiConf = [
   // 模块
   ['post', '/add_module_base_info', ModuleController.addModuleBaseInfo],
   ['get', '/get_module_info', ModuleController.getModuleInfo],
+  ['get', '/cache/queryProperptyData', ModuleController.queryProperptyData, {
+    thedate: 'notEmpty', predate: 'notEmpty', moduleName: 'notEmpty',
+  }],
   ['get', '/get_module_config_info', ModuleConfigController.getModuleConfigInfo],
   ['get', '/get_module_full_info', ModuleConfigController.getModuleConfigAndServerInfo],
   ['post', '/add_module_config', ModuleConfigController.addModuleConfig],

@@ -70,16 +70,18 @@ const Controller = {
    */
   async transferDCache(ctx) {
     try {
-      const {
-        appName, moduleName, servers, cache_version, srcGroupName, dstGroupName,
+      let {
+        appName, moduleName, servers, cache_version, srcGroupName, dstGroupName, transferExisted,
       } = ctx.paramsObj;
+      transferExisted = [true, 'true'].includes('true');
       // 是否有扩容的记录没有完成
-      const { totalNum } = await Service.getRouterChange({ appName, moduleName });
-      if (totalNum > 0) throw new Error('#dcache.hasMigrationOperation#');
+      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
+      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      if (has) throw new Error('#dcache.hasMigrationOperation#');
 
       // 扩容服务入库 opt
       await Service.transferDCache({
-        appName, moduleName, servers, cacheType: cache_version, srcGroupName,
+        appName, moduleName, servers, cacheType: cache_version, srcGroupName, transferExisted,
       });
       // 扩容服务入库 opt 后， 发布服务
       const expandRsq = await Service.releaseServer({ expandServers: servers });
