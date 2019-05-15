@@ -152,7 +152,7 @@ const ModuleConfigController = {
           shmSize: item.memory.toString(),
           // 共享内存key?
           shmKey: item.shmKey,
-          isContainer: item.is_docker.toString(),
+          isContainer: (!!item.is_docker).toString(),
         });
         CacheHost.push(host);
 

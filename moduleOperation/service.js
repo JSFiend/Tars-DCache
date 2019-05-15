@@ -135,7 +135,7 @@ service.transferDCache = async function ({ appName, moduleName, srcGroupName, se
     shmSize: item.memory.toString(),
     // 共享内存key?
     shmKey: item.shmKey,
-    isContainer: item.is_docker.toString(),
+    isContainer: (!!item.is_docker).toString(),
   }));
   const option = new DCacheOptStruct.TransferReq();
   option.readFromObject({
