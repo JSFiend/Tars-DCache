@@ -465,6 +465,7 @@ service.uninstallModule4DCache = async function ({ unType = 2, appName, moduleNa
   assert(__return === 0, errMsg);
   const module = await ModuleConfigService.getModuleConfigByName({ moduleName });
   await ModuleConfigService.removeModuleConfig({ module_name: moduleName, module_id: module.module_id });
+  await service.getUninstallPercent(option);
   return uninstallRsp;
 };
 
@@ -480,7 +481,19 @@ service.uninstallServer4DCache = async function ({ unType = 0, appName, moduleNa
   const { __return, uninstallRsp, uninstallRsp: { errMsg } } = await DCacheOptPrx.uninstall4DCache(option);
   assert(__return === 0, errMsg);
   await serverConfigService.removeServer({ server_name: serverName.replace('DCache.', '') });
+  await service.getUninstallPercent(option);
   return uninstallRsp;
+};
+
+let uninstallTimer = null;
+service.getUninstallPercent = async function (option) {
+  const { __return, UninstallProgressRsp: { percent, errMsg } } = await DCacheOptPrx.getUninstallPercent(option);
+  assert(__return === 0, errMsg);
+  if (+percent !== 100) {
+    uninstallTimer = setTimeout(() => {
+      service.getUninstallPercent(option);
+    }, 1000);
+  } else if (uninstallTimer) clearTimeout(uninstallTimer);
 };
 
 module.exports = service;
