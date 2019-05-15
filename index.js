@@ -98,6 +98,9 @@ const dcacheApiConf = [
   ['post', '/cache/stopTransfer', ModuleOperation.stopTransfer, {
     appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty',
   }],
+  ['post', '/cache/restartTransfer', ModuleOperation.restartTransfer, {
+    appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty',
+  }],
   ['post', '/cache/deleteTransfer', ModuleOperation.deleteTransfer, {
     appName: 'notEmpty', moduleName: 'notEmpty', type: 'notEmpty',
   }],
