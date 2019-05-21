@@ -41,16 +41,82 @@ const ModuleService = {};
     4 require string endTime;       //e.g. 2360
 };
  */
-ModuleService.queryProperptyData = async function ({ moduleName, serverName = '', date = [], startTime = '0000', endTime = '2360' }) {
+ModuleService.queryProperptyData = async function ({ moduleName, serverName = '', date = ['thedate', 'predate'], startTime = '0000', endTime = '2360' }) {
+  let formatRsp = [];
   const option = new DCacheOptStruct.QueryPropReq();
   option.readFromObject({ moduleName, serverName, date, startTime, endTime });
-  console.log('option', option);
   const args = await DCacheOptPrx.queryProperptyData(option);
-  console.log(args);
   const { __return, rsp } = args;
   assert(__return === 0, '获取特性监控数据出错');
-  return rsp;
+
+  if (serverName === '*') {
+    // 获取服务列表
+    // formatRsp = { data: rsp, keys: [] };
+    formatRsp = ModuleService.findServersFormat(rsp, date);
+  } else {
+    // 获取正常数据
+    formatRsp = ModuleService.normalFormat(rsp);
+  }
+  // return { rsp, formatRsp };
+  return formatRsp;
 };
+
+/**
+ * 正常格式化特性监控数据，获取特性监控参数 serverName 为空的时候
+ * @param monitorData
+ * @returns {{data: Array, keys: Array}}
+ */
+ModuleService.normalFormat = function propertyMonitorNormalFormat(monitorData = [{ moduleName: '', serverName: '', date: '', data: [{ propData: {}, timeStamp: '0000' }] }]) {
+  const data = [];
+  let keys = [];
+  const [{ moduleName, serverName, data: theData }, { data: preData }] = monitorData;
+  for (let hour = 0; hour < 24; hour++) {
+    for (let min = 0; min <= 60; min += 5) {
+      // 格式化时间为 000 =》 2360
+      const hourStr = hour < 10 ? `0${hour}` : `${hour}`;
+      const minStr = min < 10 ? `0${min}` : `${min}`;
+      const timeStr = hourStr + minStr;
+      // 当日、对比日的该时间戳是否有数据， 某一天有数据，就添加一个时间戳数据
+      const theItem = theData.find(item => item.timeStamp === timeStr);
+      const preItem = preData.find(item => item.timeStamp === timeStr);
+      const hasItem = theItem || preItem;
+      if (hasItem) {
+        const { propData, timeStamp } = hasItem;
+        const option = { show_time: timeStamp, moduleName, serverName: serverName || '%' };
+        keys = Object.keys(propData);
+        keys.forEach((item) => {
+          option[`the_${item}`] = theItem ? theItem.propData[item] : 0;
+          option[`pre_${item}`] = preItem ? preItem.propData[item] : 0;
+        });
+        data.push(option);
+      }
+    }
+  }
+  return { data, keys };
+};
+
+ModuleService.findServersFormat = function propertyMonitorFindServersFormat(monitorData = [{ moduleName: '', serverName: '', date: '', data: [{ propData: {}, timeStamp: '' }] }], [thedate, predate]) {
+  const theData = monitorData.filter(item => item.date === thedate);
+  const preData = monitorData.filter(item => item.date === predate);
+  let keys = [];
+  const formatData = [];
+  theData.forEach((theItem) => {
+    const { data, date, moduleName, serverName } = theItem;
+    const preItem = preData.find(item => item.serverName === serverName);
+    const { data: preItemData } = preItem;
+    data.forEach(({ propData = {} }, index) => {
+      const option = { date, moduleName, serverName };
+      keys = Object.keys(propData);
+      keys.forEach((property) => {
+        option[`the_${property}`] = propData[property] || 0;
+        option[`pre_${property}`] = preItemData[index].propData[property] || 0;
+      });
+      formatData.push(option);
+    });
+  });
+  return { data: formatData, keys };
+};
+
 
 ModuleService.addModuleBaseInfo = async function ({ apply_id, follower, cache_version, mkcache_struct, create_person }) {
   return moduleDao.addModuleBaseInfo({

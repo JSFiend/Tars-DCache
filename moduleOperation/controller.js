@@ -25,8 +25,8 @@ const Service = require('./service.js');
 
 const Controller = {
   /**
-   * 扩容
-   */
+     * 扩容
+     */
   async expandDCache(ctx) {
     try {
       const { appName, moduleName, status, servers, cache_version, srcGroupName } = ctx.paramsObj;
@@ -53,7 +53,7 @@ const Controller = {
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
       //  type  后台是 1、2、0, 扩容、缩容、迁移
       const { releaseId } = expandRsq;
-      const dstGroupName = Array.from(new Set(servers.map(item => item.group_name)));
+      const dstGroupName = [...new Set(servers.map(item => item.group_name))];
       Service.getReleaseProgress(releaseId, appName, moduleName, 1, srcGroupName, dstGroupName);
 
       ctx.makeResObj(200, '', expandRsq);
@@ -71,9 +71,10 @@ const Controller = {
   async transferDCache(ctx) {
     try {
       let {
-        appName, moduleName, servers, cache_version, srcGroupName, dstGroupName, transferExisted,
+        appName, moduleName, servers, cache_version, srcGroupName, dstGroupName, transferData,
       } = ctx.paramsObj;
-      transferExisted = [true, 'true'].includes('true');
+      transferData = [true, 'true'].includes(transferData);
+      console.log('transferDatatransferDatatransferDatatransferData', transferData);
       // 是否有扩容的记录没有完成
       const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
       const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
@@ -81,7 +82,7 @@ const Controller = {
 
       // 扩容服务入库 opt
       await Service.transferDCache({
-        appName, moduleName, servers, cacheType: cache_version, srcGroupName, transferExisted,
+        appName, moduleName, servers, cacheType: cache_version, srcGroupName,
       });
       // 扩容服务入库 opt 后， 发布服务
       const expandRsq = await Service.releaseServer({ expandServers: servers });
@@ -94,7 +95,7 @@ const Controller = {
       // 发布进入轮询， 轮询发布成功后调用 configTransfer， 让 opt 启动资源分配
       // 前台数据库的 type 是 expand、shriankge、migration，  后台是 1、2、0
       const { releaseId } = expandRsq;
-      Service.getReleaseProgress(releaseId, appName, moduleName, 0, [srcGroupName], [dstGroupName]);
+      Service.getReleaseProgress(releaseId, appName, moduleName, 0, [srcGroupName], [dstGroupName], transferData);
 
       ctx.makeResObj(200, '', expandRsq);
     } catch (err) {
@@ -114,8 +115,8 @@ const Controller = {
     }
   },
   /**
-   * 获取迁移管理数据
-   */
+     * 获取迁移管理数据
+     */
   async getRouterChange(ctx) {
     try {
       const { appName, moduleName, srcGroupName, dstGroupName, status, type } = ctx.paramsObj;
@@ -143,8 +144,8 @@ const Controller = {
     }
   },
   /**
-   * 缩容
-   */
+     * 缩容
+     */
   async reduceDcache(ctx) {
     try {
       const { appName, moduleName, srcGroupName } = ctx.paramsObj;
@@ -157,14 +158,14 @@ const Controller = {
     }
   },
   /**
-   * 停止迁移、扩容、缩容操作
-   * @appName     应用名
-   * @moduleName  模块名
-   * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
-   * @srcGroupName 原组
-   * @dstGroupName 目标组
-   *
-   */
+     * 停止迁移、扩容、缩容操作
+     * @appName     应用名
+     * @moduleName  模块名
+     * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
+     * @srcGroupName 原组
+     * @dstGroupName 目标组
+     *
+     */
   async stopTransfer(ctx) {
     try {
       const {
@@ -182,39 +183,14 @@ const Controller = {
     }
   },
   /**
-   * 重试迁移、扩容、缩容操作
-   * @appName     应用名
-   * @moduleName  模块名
-   * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
-   * @srcGroupName 原组
-   * @dstGroupName 目标组
-   *
-   */
-  async restartTransfer(ctx) {
-    try {
-      const {
-        appName, moduleName, type, srcGroupName, dstGroupName,
-      } = ctx.paramsObj;
-      const rsp = await Service.restartTransfer({
-        appName, moduleName, type, srcGroupName, dstGroupName,
-      });
-
-      ctx.makeResObj(200, '', rsp);
-    } catch (err) {
-      logger.error('restartTransfer:', err);
-      console.error(err);
-      ctx.makeResObj(500, err.message);
-    }
-  },
-  /**
-   * 删除迁移、扩容、缩容操作记录
-   * @appName     应用名
-   * @moduleName  模块名
-   * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
-   * @srcGroupName 原组
-   * @dstGroupName 目标组
-   *
-   */
+     * 删除迁移、扩容、缩容操作记录
+     * @appName     应用名
+     * @moduleName  模块名
+     * @type        '0' 是迁移， '1' 是扩容， '2' 是缩容
+     * @srcGroupName 原组
+     * @dstGroupName 目标组
+     *
+     */
   async deleteTransfer(ctx) {
     try {
       const {
@@ -226,7 +202,7 @@ const Controller = {
       });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      logger.error('deleteTransfer:', err);
+      logger.error('stopTransfer:', err);
       console.error(err);
       ctx.makeResObj(500, err.message);
     }
@@ -247,7 +223,7 @@ const Controller = {
 
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      logger.error('deleteOperation:', err);
+      logger.error('stopTransfer:', err);
       console.error(err);
       ctx.makeResObj(500, err.message);
     }
@@ -266,8 +242,8 @@ const Controller = {
     }
   },
   /**
-   * 主备切换
-   */
+     * 主备切换
+     */
   async switchServer(ctx) {
     try {
       const { appName, moduleName, groupName } = ctx.paramsObj;
@@ -282,8 +258,8 @@ const Controller = {
     }
   },
   /**
-   * 查询主备切换
-   */
+     * 查询主备切换
+     */
   async getSwitchInfo(ctx) {
     try {
       const { appName, moduleName, groupName } = ctx.paramsObj;

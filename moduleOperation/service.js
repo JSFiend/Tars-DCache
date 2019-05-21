@@ -109,18 +109,15 @@ service.putInServerConfig = async function ({ appName, servers }) {
  * 创建服务迁移
  * @param TransferReq
  * @returns {Promise<void>}
- * struct TransferReq
- *{
- *   0 require string appName;
- *   1 require string moduleName;
- *   2 require string srcGroupName;
- *   3 require vector<CacheHostParam> cacheHost;
- *   4 require DCacheType cacheType;
- *   5 require string version;
- *   6 optional bool transferExisted=false; // 是否向已存在的服务迁移
- *};
+ struct TransferReq
+ 0 require string appName;
+ 1 require string moduleName;
+ 2 require string srcGroupName;
+ 3 require vector<CacheHostParam> cacheHost;
+ 4 require DCacheType cacheType;
+ 5 require string version;
  */
-service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType, transferExisted = false }) {
+service.transferDCache = async function ({ appName, moduleName, srcGroupName, servers, cacheType }) {
   const hostServer = servers.find(item => item.server_type === 'M');
   const cacheHost = servers.map(item => ({
     serverName: `DCache.${item.server_name}`,
@@ -145,7 +142,6 @@ service.transferDCache = async function ({ appName, moduleName, srcGroupName, se
     cacheHost,
     cacheType,
     version: '1.1.0',
-    transferExisted,
   });
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.transferDCache(option);
   assert(__return === 0, errMsg);
@@ -199,7 +195,7 @@ service.configTransfer = async function ({
     dstGroupName,
     transferData,
   });
-
+  console.log('transferDatatransfta', transferData);
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.configTransfer(option);
   assert(__return === 0, errMsg);
   return rsp;
@@ -449,14 +445,10 @@ service.getReleaseProgress = async function (releaseId, appName, moduleName, typ
   try {
     const { percent } = await ModuleConfigService.getReleaseProgress(releaseId);
     if (+percent !== 100) {
-      timer = setTimeout(() => {
-        service.getReleaseProgress(releaseId, appName, moduleName, type, srcGroupName, dstGroupName);
-      }, 2000);
+      timer = setTimeout(service.getReleaseProgress.bind(this, releaseId, appName, moduleName, type, srcGroupName, dstGroupName, transferData), 1500);
     } else {
-      if (timer) clearInterval(timer);
-      await service.configTransfer({
-        appName, moduleName, type, srcGroupName, dstGroupName, transferData,
-      });
+      clearTimeout(timer);
+      await service.configTransfer({ appName, moduleName, type, srcGroupName, dstGroupName, transferData });
     }
   } catch (err) {
     logger.error('[getReleaseProgress]:', err);

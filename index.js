@@ -30,7 +30,6 @@ const ServerConfigController = require('./serverConfig/controller.js');
 const ProxyController = require('./proxy/controller.js');
 const RouterController = require('./router/controller.js');
 const ModuleOperation = require('./moduleOperation/controller');
-const PropertyServer = require('./propertyServer/controller');
 
 const {
   getConfig,
@@ -76,6 +75,7 @@ const dcacheApiConf = [
   // 模块
   ['post', '/add_module_base_info', ModuleController.addModuleBaseInfo],
   ['get', '/get_module_info', ModuleController.getModuleInfo],
+  // 模块特性监控
   ['get', '/cache/queryProperptyData', ModuleController.queryProperptyData, {
     thedate: 'notEmpty', predate: 'notEmpty', moduleName: 'notEmpty',
   }],
@@ -136,8 +136,6 @@ const dcacheApiConf = [
   ['post', '/cache/uninstall4DCache', ModuleOperation.uninstall4DCache, {
     appName: 'notEmpty', moduleName: 'notEmpty', serverNames: 'notEmpty',
   }],
-  // 特性监控
-  ['get', '/cache/getMonitorData', PropertyServer.getMonitorData],
   // cache 配置中心
   ['get', '/cache/getConfig', getConfig],
   ['post', '/cache/addConfig', addConfig, {

@@ -25,12 +25,10 @@ const ModuleService = require('./service.js');
 
 
 const ModuleController = {
+  // 服务名 DCache.xxx, 不填表示查询模块下所有服务合并统计数据，填"*"表示列出所有服务的独立数据
   async queryProperptyData(ctx) {
     try {
       const { thedate, predate, startshowtime, endshowtime, moduleName, serverName } = ctx.paramsObj;
-      console.log(ctx.paramsObj);
-      // ctx.makeResObj(200, '', ctx.paramsObj);
-      // return;
       const option = {
         moduleName,
         serverName,
