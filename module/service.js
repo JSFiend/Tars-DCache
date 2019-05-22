@@ -41,13 +41,14 @@ const ModuleService = {};
     4 require string endTime;       //e.g. 2360
 };
  */
-ModuleService.queryProperptyData = async function ({ moduleName, serverName = '', date = ['thedate', 'predate'], startTime = '0000', endTime = '2360' }) {
+ModuleService.queryProperptyData = async function ({ moduleName, serverName = '', date = ['thedate', 'predate'], startTime = '0000', endTime = '2360', get }) {
   let formatRsp = [];
   const option = new DCacheOptStruct.QueryPropReq();
   option.readFromObject({ moduleName, serverName, date, startTime, endTime });
   const args = await DCacheOptPrx.queryProperptyData(option);
   const { __return, rsp } = args;
   assert(__return === 0, '获取特性监控数据出错');
+  if (get) return rsp;
 
   if (serverName === '*') {
     // 获取服务列表
@@ -103,13 +104,13 @@ ModuleService.findServersFormat = function propertyMonitorFindServersFormat(moni
   theData.forEach((theItem) => {
     const { data, date, moduleName, serverName } = theItem;
     const preItem = preData.find(item => item.serverName === serverName);
-    const { data: preItemData } = preItem;
+    const { data: preItemData } = preItem || {};
     data.forEach(({ propData = {} }, index) => {
       const option = { date, moduleName, serverName };
       keys = Object.keys(propData);
       keys.forEach((property) => {
         option[`the_${property}`] = propData[property] || 0;
-        option[`pre_${property}`] = preItemData[index].propData[property] || 0;
+        option[`pre_${property}`] = preItemData ? preItemData[index].propData[property] : 0;
       });
       formatData.push(option);
     });

@@ -28,13 +28,14 @@ const ModuleController = {
   // 服务名 DCache.xxx, 不填表示查询模块下所有服务合并统计数据，填"*"表示列出所有服务的独立数据
   async queryProperptyData(ctx) {
     try {
-      const { thedate, predate, startshowtime, endshowtime, moduleName, serverName } = ctx.paramsObj;
+      const { thedate, predate, startshowtime, endshowtime, moduleName, serverName, get } = ctx.paramsObj;
       const option = {
         moduleName,
         serverName,
         date: [thedate, predate],
         startTime: startshowtime,
         endTime: endshowtime,
+        get,
       };
       const rsp = await ModuleService.queryProperptyData(option);
       ctx.makeResObj(200, '', rsp);

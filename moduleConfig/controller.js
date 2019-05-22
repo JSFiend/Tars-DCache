@@ -107,7 +107,6 @@ const ModuleConfigController = {
       ctx.makeErrResObj();
     }
   },
-  // TODO: finish this function
   installAndPublish: async (ctx) => {
     try {
       let { moduleId, mkCache } = ctx.paramsObj;
