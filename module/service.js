@@ -86,8 +86,8 @@ ModuleService.normalFormat = function propertyMonitorNormalFormat(monitorData = 
         const option = { show_time: timeStamp, moduleName, serverName: serverName || '%' };
         keys = Object.keys(propData);
         keys.forEach((item) => {
-          option[`the_${item}`] = theItem ? theItem.propData[item] : 0;
-          option[`pre_${item}`] = preItem ? preItem.propData[item] : 0;
+          option[`the_${item}`] = theItem ? theItem.propData[item] : '--';
+          option[`pre_${item}`] = preItem ? preItem.propData[item] : '--';
         });
         data.push(option);
       }
@@ -109,8 +109,8 @@ ModuleService.findServersFormat = function propertyMonitorFindServersFormat(moni
       const option = { date, moduleName, serverName };
       keys = Object.keys(propData);
       keys.forEach((property) => {
-        option[`the_${property}`] = propData[property] || 0;
-        option[`pre_${property}`] = preItemData ? preItemData[index].propData[property] : 0;
+        option[`the_${property}`] = propData[property] || '--';
+        option[`pre_${property}`] = preItemData ? preItemData[index].propData[property] : '--';
       });
       formatData.push(option);
     });
