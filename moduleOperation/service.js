@@ -37,9 +37,7 @@ const service = {};
  * @param replace
  * @returns {Promise<void>}
  */
-service.optExpandDCache = async function ({
-  appName, moduleName, expandServers, cache_version, replace = false,
-}) {
+service.optExpandDCache = async function ({ appName, moduleName, expandServers, cache_version, replace = false }) {
   const hostServer = expandServers.find(item => item.server_type === 'M');
   const cacheHost = expandServers.map(item => ({
     serverName: `DCache.${item.server_name}`,
@@ -503,9 +501,10 @@ service.uninstallServer4DCache = async function ({ unType = 0, appName, moduleNa
 
 let uninstallTimer = null;
 service.getUninstallPercent = async function (option) {
-  const { __return, UninstallProgressRsp: { percent, errMsg } } = await DCacheOptPrx.getUninstallPercent(option);
+  const { __return, progressRsp: { percent, errMsg } } = await DCacheOptPrx.getUninstallPercent(option);
   assert(__return === 0, errMsg);
-  if (+percent !== 100) {
+  // if (+percent !== 100) {
+  if (['100', '100%'].includes(percent)) {
     uninstallTimer = setTimeout(service.getUninstallPercent.bind(this, option), 500);
   } else {
     clearTimeout(uninstallTimer);

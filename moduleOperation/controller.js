@@ -74,16 +74,13 @@ const Controller = {
         appName, moduleName, servers, cache_version, srcGroupName, dstGroupName, transferData,
       } = ctx.paramsObj;
       transferData = [true, 'true'].includes(transferData);
-      console.log('transferDatatransferDatatransferDatatransferData', transferData);
       // 是否有扩容的记录没有完成
       const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
       const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
       if (has) throw new Error('#dcache.hasMigrationOperation#');
 
       // 扩容服务入库 opt
-      await Service.transferDCache({
-        appName, moduleName, servers, cacheType: cache_version, srcGroupName,
-      });
+      await Service.transferDCache({ appName, moduleName, servers, cacheType: cache_version, srcGroupName });
       // 扩容服务入库 opt 后， 发布服务
       const expandRsq = await Service.releaseServer({ expandServers: servers });
 
