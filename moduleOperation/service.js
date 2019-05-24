@@ -499,15 +499,16 @@ service.uninstallServer4DCache = async function ({ unType = 0, appName, moduleNa
   return uninstallRsp;
 };
 
-let uninstallTimer = null;
 service.getUninstallPercent = async function (option) {
   const { __return, progressRsp: { percent, errMsg } } = await DCacheOptPrx.getUninstallPercent(option);
   assert(__return === 0, errMsg);
-  // if (+percent !== 100) {
-  if (['100', '100%'].includes(percent)) {
-    uninstallTimer = setTimeout(service.getUninstallPercent.bind(this, option), 500);
-  } else {
-    clearTimeout(uninstallTimer);
+  if (percent !== 100) {
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        await service.getUninstallPercent(option);
+        resolve();
+      }, 500);
+    });
   }
 };
 

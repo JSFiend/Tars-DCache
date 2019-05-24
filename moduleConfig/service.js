@@ -68,11 +68,10 @@ ModuleConfigService.findOne = async function ({ ...where }) {
 ModuleConfigService.getReleaseProgress = async function (releaseId) {
   const moduleReleaseProgressReq = new DCacheOptStruct.ReleaseProgressReq();
   moduleReleaseProgressReq.readFromObject({ releaseId });
-  const { __return, progressRsp, progressRsp: { errMsg } } = await DCacheOptPrx.getReleaseProgress(moduleReleaseProgressReq);
+  const { __return, progressRsp, progressRsp: { errMsg, percent, releaseInfo } } = await DCacheOptPrx.getReleaseProgress(moduleReleaseProgressReq);
   assert(__return === 0, errMsg);
   const progress = [];
-  const { percent } = progressRsp;
-  progressRsp.releaseInfo.forEach((item) => {
+  releaseInfo.forEach((item) => {
     progress.push({
       serverName: item.serverName,
       nodeName: item.nodeName,
