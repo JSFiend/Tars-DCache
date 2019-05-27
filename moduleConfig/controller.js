@@ -99,7 +99,8 @@ const ModuleConfigController = {
     try {
       const { moduleId } = ctx.paramsObj;
       const queryModuleBase = ['cache_version', 'mkcache_struct', 'follower'];
-      const queryServerConf = ['id', 'area', 'apply_id', 'module_name', 'group_name', 'server_name', 'server_ip', 'server_type', 'memory', 'shmKey', 'status', 'is_docker'];
+      const queryServerConf = ['id', 'area', 'apply_id', 'module_name', 'group_name', 'server_name', 'server_ip', 'server_type', 'memory', 'shmKey', 'status', 'is_docker', 'template_name'];
+
       const item = await ModuleConfigService.getModuleConfigInfo({ moduleId, queryModuleBase, queryServerConf });
       ctx.makeResObj(200, '', item);
     } catch (err) {
@@ -111,7 +112,7 @@ const ModuleConfigController = {
     try {
       let { moduleId, mkCache } = ctx.paramsObj;
       const queryModuleBase = ['cache_version', 'mkcache_struct', 'follower'];
-      const queryServerConf = ['id', 'area', 'module_name', 'group_name', 'server_name', 'server_ip', 'server_type', 'memory', 'shmKey', 'status', 'is_docker'];
+      const queryServerConf = ['id', 'area', 'module_name', 'group_name', 'server_name', 'server_ip', 'server_type', 'memory', 'shmKey', 'status', 'is_docker', 'template_name'];
       const moduleInfo = await ModuleConfigService.getModuleConfigInfo({ moduleId, queryModuleBase, queryServerConf });
       const {
         apply_id, module_name, ServerConf, per_record_avg, ModuleBase,

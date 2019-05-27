@@ -25,7 +25,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     area: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
       defaultValue: '',
     },
     apply_id: {
@@ -73,7 +73,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     idc_area: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
       defaultValue: '',
     },
     status: {
@@ -81,8 +81,12 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0,
     },
-
     modify_person: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: '',
+    },
+    template_name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       defaultValue: '',

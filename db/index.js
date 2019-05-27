@@ -84,7 +84,7 @@ databases.forEach((database) => {
     tableObj[_.camelCase(tableName)] = sequelize.import(`${dbModelsPath}/${tableName}`);
     // sync 无表创建表， alter 新增字段
     console.log('tableName', tableName);
-    tableObj[_.camelCase(tableName)].sync({ alter: true });
+    // tableObj[_.camelCase(tableName)].sync({ alter: true });
     tableObj[_.camelCase(tableName)].sync();
   });
   Db[database] = tableObj;

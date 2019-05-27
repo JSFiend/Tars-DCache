@@ -380,22 +380,19 @@ service.switchMainBackup = async function ({ moduleName, groupName }) {
 /*
 * 发生镜像切换后，恢复镜像状态时使用
 * // 发生镜像切换后，恢复镜像状态时使用
-* struct RecoverMirrorReq
-* {
-*     0 require string appName;
-*     1 require string moduleName;
-*     2 require string groupName;
-*     3 require string mirrorIdc;
-*     4 require string dbFlag;        // 是否有DB
-*     5 require string enableErase;   // 是否使能淘汰
-* };
+struct RecoverMirrorReq
+{
+    0 require string appName;
+    1 require string moduleName;
+    2 require string groupName;
+    3 require string mirrorIdc;
+    4 require string dbFlag;        // 是否有DB
+    5 require string enableErase;   // 是否使能淘汰
+};
 */
-service.recoverMirrorStatus = async function ({
-  appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase,
-}) {
-  const option = {
-    appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase,
-  };
+service.recoverMirrorStatus = async function ({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase }) {
+  const option = new DCacheOptStruct.RecoverMirrorReq();
+  option.readFromObject({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase });
   const { __return, rsp: { errMsg } } = await DCacheOptPrx.recoverMirrorStatus(option);
   assert(__return === 0, errMsg);
   return true;

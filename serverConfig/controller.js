@@ -139,39 +139,8 @@ const ServerConfigController = {
     try {
       const options = [];
       Object.values(ctx.paramsObj).forEach((obj) => {
-        const {
-          area,
-          apply_id,
-          module_name,
-          group_name,
-          server_name,
-          server_ip,
-          server_type,
-          memory,
-          shmKey,
-          idc_area,
-          status,
-          modify_time,
-          is_docker,
-        } = obj;
-        const modify_person = 'adminUser';
-        const option = {
-          area,
-          apply_id,
-          module_name,
-          group_name,
-          server_name,
-          server_ip,
-          server_type,
-          memory,
-          shmKey: shmKey.toString(),
-          idc_area,
-          status,
-          modify_person,
-          modify_time,
-          is_docker,
-        };
-        options.push(option);
+        const { area, apply_id, module_name, group_name, server_name, server_ip, server_type, memory, shmKey, idc_area, status, modify_time, is_docker, template_name, modify_person = 'adminUser' } = obj;
+        options.push({ area, apply_id, module_name, group_name, server_name, server_ip, server_type, memory, shmKey, idc_area, status, modify_time, is_docker, template_name, modify_person });
       });
       const item = await ServerConfigService.addServerConfig(options);
       ctx.makeResObj(200, '', item);
