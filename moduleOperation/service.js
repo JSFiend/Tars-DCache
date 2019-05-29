@@ -42,7 +42,7 @@ service.optExpandDCache = async function ({ appName, moduleName, expandServers, 
   const cacheHost = expandServers.map(item => ({
     serverName: `DCache.${item.server_name}`,
     serverIp: item.server_ip,
-    templateFile: 'tars.default',
+    templateFile: item.template_name || 'tars.default',
     type: item.server_type,
     // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
     bakSrcServerName: item.server_type === 'M' ? '' : `DCache.${hostServer.server_name}`,
@@ -120,7 +120,7 @@ service.transferDCache = async function ({ appName, moduleName, srcGroupName, se
   const cacheHost = servers.map(item => ({
     serverName: `DCache.${item.server_name}`,
     serverIp: item.server_ip,
-    templateFile: 'tars.default',
+    templateFile: item.template_name || 'tars.default',
     type: item.server_type,
     // 主机的 bakSrcServerName 为 空， 备机和镜像为主机的名称
     bakSrcServerName: item.server_type === 'M' ? '' : `DCache.${hostServer.server_name}`,
@@ -290,14 +290,12 @@ service.stopTransfer = async function ({
  * @dstGroupName 目标组
  *
  */
-service.restartTransfer = async function ({
-  appName = '', moduleName = '', type = '1', srcGroupName = '', dstGroupName = '',
-}) {
+service.restartTransfer = async function ({ appName = '', moduleName = '', type = '1', srcGroupName = '', dstGroupName = '' }) {
   const option = new DCacheOptStruct.RestartTransferReq();
   option.readFromObject({
     appName,
     moduleName,
-    type: `${type}`,
+    type,
     srcGroupName,
     dstGroupName,
   });
@@ -386,13 +384,11 @@ struct RecoverMirrorReq
     1 require string moduleName;
     2 require string groupName;
     3 require string mirrorIdc;
-    4 require string dbFlag;        // 是否有DB
-    5 require string enableErase;   // 是否使能淘汰
 };
 */
-service.recoverMirrorStatus = async function ({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase }) {
+service.recoverMirrorStatus = async function ({ appName, moduleName, groupName, mirrorIdc }) {
   const option = new DCacheOptStruct.RecoverMirrorReq();
-  option.readFromObject({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase });
+  option.readFromObject({ appName, moduleName, groupName, mirrorIdc });
   const { __return, rsp: { errMsg } } = await DCacheOptPrx.recoverMirrorStatus(option);
   assert(__return === 0, errMsg);
   return true;

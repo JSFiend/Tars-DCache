@@ -58,6 +58,7 @@ Service.addExpandServer = function (expandServer) {
     server_name: item.server_name,
     server_ip: item.server_ip,
     server_type: item.server_type,
+    template_name: item.template_name,
     memory: item.memory,
     shmKey: item.shmKey,
     idc_area: item.idc_area,

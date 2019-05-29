@@ -143,7 +143,7 @@ const ModuleConfigController = {
         host.readFromObject({
           serverName: `DCache.${item.server_name}`,
           serverIp: item.server_ip,
-          templateFile: 'tars.default',
+          templateFile: item.template_name || 'tars.default',
           type: optServerType[item.server_type],
           bakSrcServerName: item.server_type ? `DCache.${ServerConf[0].server_name}` : '',
           idc: item.area,

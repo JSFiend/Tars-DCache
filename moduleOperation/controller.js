@@ -301,5 +301,15 @@ const Controller = {
       ctx.makeResObj(500, err.message);
     }
   },
+  async restartTransfer(ctx) {
+    try {
+      const { appName, moduleName, type, srcGroupName, dstGroupName } = ctx.paramsObj;
+      const rsp = await Service.restartTransfer({ appName, moduleName, type, srcGroupName, dstGroupName });
+      ctx.makeResObj(200, '', rsp);
+    } catch (err) {
+      console.error(err);
+      ctx.makeResObj(500, err.message);
+    }
+  },
 };
 module.exports = Controller;
