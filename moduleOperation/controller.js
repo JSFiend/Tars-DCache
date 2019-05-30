@@ -227,9 +227,9 @@ const Controller = {
   },
   async hasOperation(ctx) {
     try {
-      const { appName, moduleName, type } = ctx.paramsObj;
-      // 是否有扩容的记录没有完成
-      let { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName, type });
+      const { appName, moduleName, srcGroupName, dstGroupName, status, type } = ctx.paramsObj;
+      // 获取该模块下所有的操作记录， 有三种， 0、1、2 迁移、扩容、缩容
+      let { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
       // 后台返回的是模糊匹配结果，需要过滤掉, 有这个 appName
       console.log('transferRecord', transferRecord);
       transferRecord = transferRecord.filter((item) => {
@@ -237,10 +237,17 @@ const Controller = {
         if (appName !== undefined && item.appName !== appName) ok = false;
         if (moduleName !== undefined && item.moduleName !== moduleName) ok = false;
         if (type !== undefined && item.type !== type) ok = false;
+        // 类型是0（迁移）的时候，如果源组没有迁移记录，是可以再操作的。上面的判断已经把源组过滤过来了
+        if (item.type === 0 && srcGroupName !== undefined && item.srcGroupName !== srcGroupName) ok = false;
+        if (dstGroupName !== undefined && item.dstGroupName !== dstGroupName) ok = false;
+        if (status !== undefined && item.status !== status) ok = false;
         return ok;
       });
       console.log('transferRecord', transferRecord);
-      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      // 完成和停止的不算有不可再操作记录。
+      // 判断有效的记录
+      const len = transferRecord.filter(item => ![4, 5].includes(item.status)).length;
+      const has = totalNum ? len : false;
       ctx.makeResObj(200, '', !!has);
     } catch (err) {
       logger.error('has Operation:', err);
