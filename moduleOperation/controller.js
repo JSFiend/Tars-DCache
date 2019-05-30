@@ -229,7 +229,17 @@ const Controller = {
     try {
       const { appName, moduleName, type } = ctx.paramsObj;
       // 是否有扩容的记录没有完成
-      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName, type });
+      let { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName, type });
+      // 后台返回的是模糊匹配结果，需要过滤掉, 有这个 appName
+      console.log('transferRecord', transferRecord);
+      transferRecord = transferRecord.filter((item) => {
+        let ok = true;
+        if (appName !== undefined && item.appName !== appName) ok = false;
+        if (moduleName !== undefined && item.moduleName !== moduleName) ok = false;
+        if (type !== undefined && item.type !== type) ok = false;
+        return ok;
+      });
+      console.log('transferRecord', transferRecord);
       const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
       ctx.makeResObj(200, '', !!has);
     } catch (err) {
