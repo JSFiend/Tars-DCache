@@ -64,6 +64,7 @@ Object.assign(serverConfStruct, {
   shmKey: '',
   cache_version: '',
   apply_id: '',
+  routerPageNo: '',
 });
 
 const ServerConfigController = {
@@ -91,6 +92,7 @@ const ServerConfigController = {
         server.setDataValue('memory', cacheServer.memSize / 1024);
         server.setDataValue('app_name', cacheServer.appName);
         server.setDataValue('cache_version', cacheServer.cacheType);
+        server.setDataValue('routerPageNo', cacheServer.routerPageNo);
       });
       ctx.makeResObj(200, '', util.viewFilter(serverList, serverConfStruct));
     } catch (err) {

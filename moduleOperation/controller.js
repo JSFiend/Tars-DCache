@@ -33,9 +33,9 @@ const Controller = {
       logger.info({ appName, moduleName, status, servers, cache_version, srcGroupName });
 
       // 是否有扩容的记录没有完成
-      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
-      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
-      if (has) throw new Error('#dcache.hasExpandOperation#');
+      // const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
+      // const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      // if (has) throw new Error('#dcache.hasExpandOperation#');
 
       // 扩容服务入库 opt
       await Service.optExpandDCache({
@@ -75,9 +75,9 @@ const Controller = {
       } = ctx.paramsObj;
       transferData = [true, 'true'].includes(transferData);
       // 是否有扩容的记录没有完成
-      const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
-      const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
-      if (has) throw new Error('#dcache.hasMigrationOperation#');
+      // const { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName, srcGroupName });
+      // const has = totalNum ? transferRecord.filter(item => ![4, 5].includes(item.status)).length : false;
+      // if (has) throw new Error('#dcache.hasMigrationOperation#');
 
       // 扩容服务入库 opt
       await Service.transferDCache({ appName, moduleName, servers, cacheType: cache_version, srcGroupName });
