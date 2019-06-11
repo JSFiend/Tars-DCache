@@ -39,7 +39,7 @@ const Controller = {
 
       // 扩容服务入库 opt
       await Service.optExpandDCache({
-        appName, moduleName, expandServers: servers, cache_version, replace: false,
+        appName, moduleName, expandServers: servers, cache_version, replace: true,
       });
 
       // 扩容服务入库 opt 后， 发布服务

@@ -37,7 +37,7 @@ const service = {};
  * @param replace
  * @returns {Promise<void>}
  */
-service.optExpandDCache = async function ({ appName, moduleName, expandServers, cache_version, replace = false }) {
+service.optExpandDCache = async function ({ appName, moduleName, expandServers, cache_version, replace = true }) {
   const hostServer = expandServers.find(item => item.server_type === 'M');
   const cacheHost = expandServers.map(item => ({
     serverName: `DCache.${item.server_name}`,

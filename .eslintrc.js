@@ -14,7 +14,8 @@ module.exports = {
   },
   rules: {
     "import/no-dynamic-require": 0,
-    "camelcase": 1,
+    "no-console": 0,
+    "camelcase": 0,
     "func-names": 0,
     "max-len": ["error", 300],
     "no-param-reassign": ["error", { "props": false }],

@@ -25,12 +25,6 @@ const ModuleConfigService = require('./service.js');
 const PatchService = require(path.join(cwd, './app/service/patch/PatchService'));
 const { DCacheOptPrx, DCacheOptStruct } = require(path.join(cwd, './app/service/util/rpcClient'));
 
-
-// function mapKeyType(key) {
-//   if (key === 0) return 'string';
-//   if (key === 1) return 'int';
-//   return 'longlong';
-// }
 function mapCacheType(key) {
   if (key === 1) return 'hash';
   if (key === 2) return 'list';

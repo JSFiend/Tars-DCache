@@ -13,13 +13,35 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
+const { toString } = Object.prototype;
 
 const { tApplyAppBase, tApplyCacheServerConf, tApplyCacheModuleConf } = require('./../db').db_cache_web;
 
 const serverConf = {};
 
 
-serverConf.add = function (option) {
+serverConf.add = async function (option) {
+  if (toString.call(option) === '[object Array]') {
+    const promiseArray = [];
+    option.forEach(item => promiseArray.push(serverConf.destroy({
+      where: {
+        apply_id: item.apply_id,
+        module_name: item.module_name,
+        group_name: item.group_name,
+        server_name: item.server_name,
+      },
+    })));
+    await Promise.all(promiseArray);
+  } else if (toString.call(option) === '[object Object]') {
+    serverConf.destroy({
+      where: {
+        apply_id: option.apply_id,
+        module_name: option.module_name,
+        group_name: option.group_name,
+        server_name: option.server_name,
+      },
+    });
+  }
   return tApplyCacheServerConf.bulkCreate(option);
 };
 

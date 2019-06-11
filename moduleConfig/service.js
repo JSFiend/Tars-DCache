@@ -34,7 +34,7 @@ ModuleConfigService.addModuleConfig = async function (option) {
   } else if (item) {
     // 如果模块已存在但没安装成功，删除原有模块记录
     await moduleConfigDao.destroy({ where: { module_name }, force: true });
-    await moduleDao.destroy({ where: { id: item.module_id }, force: true });
+    // await moduleDao.destroy({ where: { id: item.module_id }, force: true });
     await serverConfigDao.destroy({ where: { module_name }, force: true });
   }
   console.log(option);
