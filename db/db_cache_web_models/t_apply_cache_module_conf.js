@@ -70,6 +70,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: '',
     },
+    // 应用场景 1、 cache， 2、cache 加数据库
     cache_module_type: {
       type: DataTypes.INTEGER(4),
       allowNull: true,
@@ -95,6 +96,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0,
     },
+    // 1、内存数据库不淘汰， 2、临时缓存过期淘汰，3、热点缓存容量淘汰
     key_type: {
       type: DataTypes.INTEGER(4),
       allowNull: true,

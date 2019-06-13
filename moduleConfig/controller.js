@@ -55,11 +55,11 @@ const ModuleConfigController = {
       const create_person = 'adminUser';
       const option = {
         admin,
-        cache_module_type: +cache_module_type,
+        cache_module_type: +cache_module_type || 0,
         cache_type,
         dbAccessServant,
         idc_area,
-        key_type: +key_type,
+        key_type: +key_type || 0,
         max_read_flow,
         max_write_flow,
         apply_id,
