@@ -39,7 +39,7 @@ const ModuleConfigController = {
         admin,
         cache_module_type,
         cache_type,
-        db_data_count,
+        dbAccessServant,
         idc_area,
         key_type,
         max_read_flow,
@@ -55,11 +55,11 @@ const ModuleConfigController = {
       const create_person = 'adminUser';
       const option = {
         admin,
-        cache_module_type,
+        cache_module_type: +cache_module_type,
         cache_type,
-        db_data_count,
+        dbAccessServant,
         idc_area,
-        key_type,
+        key_type: +key_type,
         max_read_flow,
         max_write_flow,
         apply_id,
@@ -109,7 +109,7 @@ const ModuleConfigController = {
       const queryServerConf = ['id', 'area', 'module_name', 'group_name', 'server_name', 'server_ip', 'server_type', 'memory', 'shmKey', 'status', 'is_docker', 'template_name'];
       const moduleInfo = await ModuleConfigService.getModuleConfigInfo({ moduleId, queryModuleBase, queryServerConf });
       const {
-        apply_id, module_name, ServerConf, per_record_avg, ModuleBase,
+        apply_id, module_name, ServerConf, per_record_avg, ModuleBase, dbAccessServant, cache_module_type, key_type,
       } = moduleInfo;
       const applyInfo = await ApplyService.getApply({ applyId: apply_id });
       const isMKCache = ModuleBase.cache_version === 2;
@@ -118,7 +118,7 @@ const ModuleConfigController = {
       const releaseArr = [];
       let args;
       mkCache = mkCache && JSON.parse(mkCache);
-
+      console.log('cache_module_type, key_type,cache_module_type, key_type,cache_module_type, key_type,', cache_module_type, key_type);
       // 先获取发布包id
       const defaultCachePackage = await PatchService.find({
         where: {
@@ -172,14 +172,15 @@ const ModuleConfigController = {
         kvCacheConf.readFromObject({
           avgDataSize: per_record_avg.toString(),
           readDbFlag: 'Y',
-          enableErase: 'N',
-          eraseRadio: '',
-          saveOnlyKey: 'Y',
-          dbFlag: 'N',
-          dbAccessIntfaceType: '',
-          dbAccessServant: '',
-          startExpireThread: 'N',
-          expireDb: 'N',
+          enableErase: key_type === 3 ? 'Y' : 'N',
+          eraseRadio: '95%',
+          saveOnlyKey: 'N',
+          dbFlag: cache_module_type === 2 ? 'Y' : 'N',
+          dbAccessServant: cache_module_type === 2 ? dbAccessServant : '',
+          startExpireThread: key_type === 2 ? 'Y' : 'N',
+          expireDb: 'Y',
+          hotBackupDays: '3',
+          coldBackupDays: '3',
         });
         const option = new DCacheOptStruct.InstallKVCacheReq();
         console.log('moduleInfo', moduleInfo);
@@ -198,18 +199,18 @@ const ModuleConfigController = {
         // 二期模块
         const mkvCacheConf = new DCacheOptStruct.MultiKeyConfParam();
         mkvCacheConf.readFromObject({
-          // mkSize: mkCache.mainKey[0].maxLen,
           avgDataSize: per_record_avg.toString(),
           readDbFlag: 'Y',
-          enableErase: 'N',
-          eraseRadio: '',
-          saveOnlyKey: 'Y',
-          dbFlag: 'N',
-          // dbAccessIntfaceType: '',
-          dbAccessServant: '',
-          startExpireThread: 'N',
-          expireDb: 'N',
+          enableErase: key_type === 3 ? 'Y' : 'N',
+          eraseRadio: '95%',
+          saveOnlyKey: 'N',
+          dbFlag: cache_module_type === 2 ? 'Y' : 'N',
+          dbAccessServant: cache_module_type === 2 ? dbAccessServant : '',
+          startExpireThread: key_type === 2 ? 'Y' : 'N',
+          expireDb: 'Y',
           cacheType: mapCacheType(ModuleBase.mkcache_struct),
+          hotBackupDays: '3',
+          coldBackupDays: '3',
         });
         // map param vector<RecordParam> fieldParam
         const fieldParam = [];

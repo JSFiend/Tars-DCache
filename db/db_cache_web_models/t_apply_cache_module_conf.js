@@ -100,6 +100,11 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 0,
     },
+    dbAccessServant: {
+      type: DataTypes.STRING(150),
+      allowNull: false,
+      defaultValue: '',
+    },
     module_remark: {
       type: DataTypes.TEXT,
       allowNull: true,

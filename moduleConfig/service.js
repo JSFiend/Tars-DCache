@@ -37,7 +37,6 @@ ModuleConfigService.addModuleConfig = async function (option) {
     // await moduleDao.destroy({ where: { id: item.module_id }, force: true });
     await serverConfigDao.destroy({ where: { module_name }, force: true });
   }
-  console.log(option);
   return moduleConfigDao.add(option);
 };
 
