@@ -46,7 +46,6 @@ applyDao.findAll = async function ({
   }
   // 一般来说，查找的都是安装成功的、即status=2
   if (!where.status) where.status = 2;
-  console.log('wherer', where);
   const data = await tApplyAppBase.findAll({
     where,
     raw,

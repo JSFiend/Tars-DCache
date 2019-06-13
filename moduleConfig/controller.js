@@ -118,7 +118,6 @@ const ModuleConfigController = {
       const releaseArr = [];
       let args;
       mkCache = mkCache && JSON.parse(mkCache);
-      console.log('cache_module_type, key_type,cache_module_type, key_type,cache_module_type, key_type,', cache_module_type, key_type);
       // 先获取发布包id
       const defaultCachePackage = await PatchService.find({
         where: {
@@ -183,8 +182,6 @@ const ModuleConfigController = {
           coldBackupDays: '3',
         });
         const option = new DCacheOptStruct.InstallKVCacheReq();
-        console.log('moduleInfo', moduleInfo);
-        console.log('moduleInfo.status', moduleInfo.status);
         option.readFromObject({
           appName: applyInfo.name,
           moduleName: module_name,
@@ -193,7 +190,6 @@ const ModuleConfigController = {
           version: ModuleBase.cache_version.toString(),
           replace: moduleInfo.status === 2,
         });
-        console.log(option.kvCacheConf);
         args = await DCacheOptPrx.installKVCacheModule(option);
       } else {
         // 二期模块
@@ -264,7 +260,6 @@ const ModuleConfigController = {
         });
         args = await DCacheOptPrx.installMKVCacheModule(option);
       }
-      console.log('[DCacheOptPrx.installApp]:', args);
       // 安装成功， 进入发布
       if (args.__return === 0) {
         // 应用进入目录树

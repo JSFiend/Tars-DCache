@@ -59,7 +59,6 @@ const Controller = {
       ctx.makeResObj(200, '', expandRsq);
     } catch (err) {
       logger.error('[module operation expend]:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -97,7 +96,6 @@ const Controller = {
       ctx.makeResObj(200, '', expandRsq);
     } catch (err) {
       logger.error('[module operation migration]:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -107,7 +105,6 @@ const Controller = {
       const rsp = await Service.transferDCacheGroup({ appName, moduleName, srcGroupName, dstGroupName, transferData });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -121,7 +118,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('[module operation getRouterChange]:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -136,7 +132,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('[module operation configTransfer]:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -150,7 +145,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('[module operation reduce dcache]', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -175,7 +169,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('stopTransfer:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -200,7 +193,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('stopTransfer:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -221,7 +213,6 @@ const Controller = {
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
       logger.error('stopTransfer:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -231,7 +222,6 @@ const Controller = {
       // 获取该模块下所有的操作记录， 有三种， 0、1、2 迁移、扩容、缩容
       let { totalNum, transferRecord } = await Service.getRouterChange({ appName, moduleName });
       // 后台返回的是模糊匹配结果，需要过滤掉, 有这个 appName
-      console.log('transferRecord', transferRecord);
       transferRecord = transferRecord.filter((item) => {
         let ok = true;
         if (appName !== undefined && item.appName !== appName) ok = false;
@@ -243,7 +233,6 @@ const Controller = {
         if (status !== undefined && item.status !== status) ok = false;
         return ok;
       });
-      console.log('transferRecord', transferRecord);
       // 完成和停止的不算有不可再操作记录。
       // 判断有效的记录
       const len = transferRecord.filter(item => ![4, 5].includes(item.status)).length;
@@ -251,7 +240,6 @@ const Controller = {
       ctx.makeResObj(200, '', !!has);
     } catch (err) {
       logger.error('has Operation:', err);
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -267,7 +255,6 @@ const Controller = {
       rsp = await Service.switchMainBackup({ appName, moduleName, groupName });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -280,7 +267,6 @@ const Controller = {
       const rsp = await Service.getSwitchInfo({ appName, moduleName, groupName });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -290,7 +276,6 @@ const Controller = {
       const rsp = await Service.recoverMirrorStatus({ appName, moduleName, groupName, mirrorIdc, dbFlag, enableErase });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -314,7 +299,6 @@ const Controller = {
       }
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },
@@ -324,7 +308,6 @@ const Controller = {
       const rsp = await Service.restartTransfer({ appName, moduleName, type, srcGroupName, dstGroupName });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error(err);
       ctx.makeResObj(500, err.message);
     }
   },

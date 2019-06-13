@@ -52,7 +52,6 @@ databases.forEach((database) => {
       charset,
     },
     logging(sqlText) {
-      console.log(sqlText);
       logger.sql(sqlText);
     },
     pool: {
@@ -70,9 +69,7 @@ databases.forEach((database) => {
   (async function () {
     try {
       await sequelize.authenticate();
-      console.log('Mysql connection has been established successfully.');
     } catch (err) {
-      console.error('Mysql connection err', err);
     }
   }());
 
@@ -83,9 +80,8 @@ databases.forEach((database) => {
     const tableName = dbModel.replace(/\.js$/g, '');
     tableObj[_.camelCase(tableName)] = sequelize.import(`${dbModelsPath}/${tableName}`);
     // sync 无表创建表， alter 新增字段
-    console.log('tableName', tableName);
-    tableObj[_.camelCase(tableName)].sync({ alter: true });
-    // tableObj[_.camelCase(tableName)].sync();
+    // tableObj[_.camelCase(tableName)].sync({ alter: true });
+    tableObj[_.camelCase(tableName)].sync();
   });
   Db[database] = tableObj;
   Db[database].sequelize = sequelize;

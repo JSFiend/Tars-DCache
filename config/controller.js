@@ -44,7 +44,6 @@ controller.getConfig = async function (ctx) {
     const configList = await getConfig();
     ctx.makeResObj(200, '', configList);
   } catch (err) {
-    console.error('[getConfig]: ', err);
     logger.error('[getConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -60,7 +59,6 @@ controller.addConfig = async function (ctx) {
     });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[addConfig]: ', err);
     logger.error('[addConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -72,7 +70,6 @@ controller.deleteConfig = async function (ctx) {
     const res = await deleteConfig({ id });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[deleteConfig]: ', err);
     logger.error('[deleteConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -88,7 +85,6 @@ controller.editConfig = async function (ctx) {
     });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[deleteConfig]: ', err);
     logger.error('[deleteConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -100,7 +96,6 @@ controller.getModuleConfig = async function (ctx) {
     const res = await getServerConfigItemList({ appName, moduleName });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[getModuleConfig]: ', err);
     logger.error('[getModuleConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -117,7 +112,6 @@ controller.getServerConfig = async function (ctx) {
     });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[getServerConfig]: ', err);
     logger.error('[getServerConfig]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -129,7 +123,6 @@ controller.getServerNodeConfig = async function (ctx) {
     const res = await getServerNodeConfigItemList({ serverName, nodeName });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[getServerNodeConfigItemList]: ', err);
     logger.error('[getServerNodeConfigItemList]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -142,7 +135,6 @@ controller.addServerConfigItem = async function (ctx) {
     const res = await addServerConfigItem({ appName, moduleName, serverName, nodeName, configValue, itemId });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[addServerConfigItem]: ', err);
     logger.error('[addServerConfigItem]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -154,7 +146,6 @@ controller.deleteServerConfigItem = async function (ctx) {
     const res = await deleteServerConfigItem({ indexId: id });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[deleteServerConfigItem]: ', err);
     logger.error('[deleteServerConfigItem]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -167,7 +158,6 @@ controller.updateServerConfigItem = async function (ctx) {
     const res = await updateServerConfigItem({ indexId: id, configValue });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[updateServerConfigItem]: ', err);
     logger.error('[updateServerConfigItem]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -179,7 +169,6 @@ controller.updateServerConfigItemBatch = async function (ctx) {
     const res = await updateServerConfigItemBatch({ serverConfigList });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[updateServerConfigItemBatch]: ', err);
     logger.error('[updateServerConfigItemBatch]: ', err);
     ctx.makeResObj(500, err.message, {});
   }
@@ -191,7 +180,6 @@ controller.deleteServerConfigItemBatch = async function (ctx) {
     const res = await deleteServerConfigItemBatch({ serverConfigList });
     ctx.makeResObj(200, '', res);
   } catch (err) {
-    console.error('[deleteServerConfigItemBatch]: ', err);
     logger.error('[deleteServerConfigItemBatch]: ', err);
     ctx.makeResObj(500, err.message, {});
   }

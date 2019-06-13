@@ -14,11 +14,6 @@
  * specific language governing permissions and limitations under the License.
  */
 
-console.log('tars-dcache');
-console.log('__dirname', __dirname);
-console.log('cwd', process.cwd());
-console.log('__filename', __filename);
-
 const cwd = process.cwd();
 const path = require('path');
 

@@ -34,8 +34,6 @@ const ApplyController = {
     try {
       // 获取 Dcache 的三个服务
       let tarsDcache = await TreeService.getTreeNodes(ctx.uid, '', ['DCache.DCacheOptServer', 'DCache.ConfigServer', 'DCache.PropertyServer']);
-
-      console.log('tarsDcachetarsDcache', tarsDcache.length);
       let serverList = [];
       const treeNodeMap = {};
       const rootNode = [];
@@ -94,7 +92,6 @@ const ApplyController = {
       const cacheServers = await getPublishSuccessModuleConfig();
       cacheServers.forEach((cacheServerItem) => {
         const cacheServer = cacheServerItem.get({ plain: true });
-        // console.log(cacheServer.server_name)
         // 看看存不存在该应用， 不存在就返回
         const applyNode = rootNode.find(node => node.name === cacheServer.AppBase.name);
         if (!applyNode) return false;
@@ -268,7 +265,6 @@ const ApplyController = {
           releaseArr.push(releaseInfo);
         });
         releaseInfoOption.readFromObject(releaseArr);
-        console.log(releaseInfoOption);
         const argsProxy = await DCacheOptPrx.releaseServer(releaseInfoOption);
         // {"__return":0,"releaseRsp":{"releaseId":1,"errMsg":"sucess to release server"}}
         logger.info('[DCacheOptPrx.publishApp] argsProxy:', argsProxy);

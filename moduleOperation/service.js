@@ -54,7 +54,6 @@ service.optExpandDCache = async function ({ appName, moduleName, expandServers, 
     shmKey: item.shmKey,
     isContainer: (!!item.is_docker).toString(),
   }));
-  console.log('cacheHost', cacheHost);
   const option = new DCacheOptStruct.ExpandReq();
   option.readFromObject({
     appName,
@@ -193,7 +192,6 @@ service.configTransfer = async function ({
     dstGroupName,
     transferData,
   });
-  console.log('transferDatatransfta', transferData);
   const { __return, rsp, rsp: { errMsg } } = await DCacheOptPrx.configTransfer(option);
   assert(__return === 0, errMsg);
   return rsp;
@@ -326,7 +324,6 @@ service.deleteTransfer = async function ({
     dstGroupName,
   });
   const res = await DCacheOptPrx.deleteTransfer(option);
-  console.log('res', res);
   const { __return, rsp, rsp: { errMsg } } = res;
   assert(__return === 0, errMsg);
   return rsp;
@@ -443,7 +440,6 @@ service.getReleaseProgress = async function (releaseId, appName, moduleName, typ
     }
   } catch (err) {
     logger.error('[getReleaseProgress]:', err);
-    console.error(err);
   }
 };
 

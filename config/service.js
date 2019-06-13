@@ -53,7 +53,6 @@ Service.addConfig = async function ({
     period,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.addCacheConfigItem(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -64,7 +63,6 @@ Service.deleteConfig = async function ({ id }) {
     id,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.deleteCacheConfigItem(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -77,7 +75,6 @@ Service.editConfig = async function ({
     id, remark, item, path, reload, period,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.updateCacheConfigItem(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -98,7 +95,6 @@ Service.getServerConfigItemList = async function ({
     indexId,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.getServerConfigItemList(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -120,7 +116,6 @@ Service.getServerNodeConfigItemList = async function ({
     indexId,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.getServerNodeConfigItemList(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -142,13 +137,9 @@ Service.addServerConfigItem = async function ({
   });
   try {
     const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.addServerConfigItem(option);
-    console.log('addServerConfigItem', {
-      __return, configItemList, errMsg,
-    });
     assert(__return === 0, errMsg);
     return configItemList;
   } catch (err) {
-    console.error(err);
     throw new Error(err);
   }
 };
@@ -170,7 +161,6 @@ Service.deleteServerConfigItem = async function ({
     indexId,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.deleteServerConfigItem(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -192,7 +182,6 @@ Service.updateServerConfigItem = async function ({
     indexId,
   });
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.updateServerConfigItem(option);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -232,7 +221,6 @@ Service.updateServerConfigItemBatch = async function ({ serverConfigList }) {
   });
   ServerConfigReqOption.readFromObject(array);
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.updateServerConfigItemBatch(ServerConfigReqOption);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };
@@ -273,7 +261,6 @@ Service.deleteServerConfigItemBatch = async function ({ serverConfigList }) {
   });
   ServerConfigReqOption.readFromObject(array);
   const { __return, configRsp: { errMsg, configItemList } } = await DCacheOptPrx.deleteServerConfigItemBatch(ServerConfigReqOption);
-  console.log({ __return, configItemList, errMsg });
   assert(__return === 0, errMsg);
   return configItemList;
 };

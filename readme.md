@@ -1,5 +1,5 @@
 ## 介绍
-`tars-dcache` 模块， 是 Tars web service 的扩展，用于管理 DCache 服务。
+`tars-dcache` 模块， 是 Tars web 的扩展，用于管理 DCache 服务。
 * [Tars web service](https://github.com/TarsCloud/TarsWeb)
  
 ## 用法

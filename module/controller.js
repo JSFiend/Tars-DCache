@@ -40,7 +40,6 @@ const ModuleController = {
       const rsp = await ModuleService.queryProperptyData(option);
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
-      console.error('queryProperptyData', err);
       logger.error('[queryProperptyData]:', err);
       ctx.makeResObj(500, err.message);
     }

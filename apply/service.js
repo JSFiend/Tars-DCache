@@ -121,7 +121,6 @@ ApplyService.hasModule = async function ({ serverType, serverName }) {
 
   const moduleServer = await ModuleConfigService.findOne({ apply_id: applyId });
   // let moduleServer = await serverConfigService.findByApplyId({applyId});
-  console.log('moduleServer', moduleServer);
   return !!moduleServer;
 };
 
