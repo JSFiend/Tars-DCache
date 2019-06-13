@@ -69,8 +69,7 @@ databases.forEach((database) => {
   (async function () {
     try {
       await sequelize.authenticate();
-    } catch (err) {
-    }
+    } catch (err) { /* Ignore */ }
   }());
 
   const tableObj = {};

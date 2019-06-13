@@ -81,4 +81,12 @@ ModuleConfigService.getReleaseProgress = async function (releaseId) {
   return { progress, percent };
 };
 
+function testEslint(data) {
+  /* eslint no-param-reassign:0 */
+  try {
+    data = JSON.parse(data);
+  } catch (e) { /* Ignore */ }
+  return data;
+}
+testEslint();
 module.exports = ModuleConfigService;
