@@ -79,8 +79,8 @@ databases.forEach((database) => {
     const tableName = dbModel.replace(/\.js$/g, '');
     tableObj[_.camelCase(tableName)] = sequelize.import(`${dbModelsPath}/${tableName}`);
     // sync 无表创建表， alter 新增字段
+    // tableObj[_.camelCase(tableName)].sync();
     // tableObj[_.camelCase(tableName)].sync({ alter: true });
-    tableObj[_.camelCase(tableName)].sync();
   });
   Db[database] = tableObj;
   Db[database].sequelize = sequelize;

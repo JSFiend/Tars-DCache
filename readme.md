@@ -1,6 +1,9 @@
 ## 介绍
-`tars-dcache` 模块， 是 Tars web 的扩展，用于管理 DCache 服务。
-* [Tars web service](https://github.com/TarsCloud/TarsWeb)
+`@tars/dcache` 模块， 是 Tars web 的扩展，用于管理 DCache 服务。依赖 [Tars web](https://github.com/TarsCloud/TarsWeb) 和 [DCache](https://github.com/Tencent/DCache)，请参考安装文档进行安装再引入 `@tars/dcache` 模块。
+#### 安装
+`@tars/dcache` 模块，依赖 `Tars` 、`Tars web` 和 `DCache`，请参考安装文档进行安装再引入 `@tars/dcache` 模块。
+* [Tars 安装文档](https://github.com/TarsCloud/Tars/blob/master/Install.zh.md)
+* [DCache 安装文档](https://github.com/Tencent/DCache/blob/master/docs/install.md)
  
 ## 用法
  
@@ -10,8 +13,8 @@
    enableDcache: true
  }
  ```
- 2、安装 `tars-dcache` 模块
- > npm install tars-dcache --save
+ 2、安装 `@tars/dcache` 模块
+ > npm install @tars/dcache --save
  
  3、新建 `db_cache_web` 数据库， 并执行 `Tars web service` 项目`sql`文件夹下的`db_cache_web.sql`脚本，创建`DCache web`所需要的表。
  ```
