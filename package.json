@@ -12,7 +12,22 @@
     "precommit-msg",
     "lint"
   ],
-  "author": "",
+  "homepage": "https://github.com/JSFiend/Tars-DCache",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JSFiend/Tars-DCache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JSFiend/Tars-DCache/issues"
+  },
+  "keywords": [
+    "Tars",
+    "DCache"
+  ],
+  "author": {
+    "name": "combineli",
+    "email": "combineli@tencent.com"
+  },
   "dependencies": {
     "@tars/stream": "^2.0.1",
     "@tars/utils": "^2.0.0",
@@ -23,15 +38,11 @@
     "node-schedule": "^1.3.2",
     "sequelize": "^4.42.0"
   },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.1",
     "pre-commit": "^1.2.2"
-  }
+  },
+  "license": "BSD-3-Clause"
 }
