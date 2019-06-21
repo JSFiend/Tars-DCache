@@ -101,7 +101,8 @@ const Controller = {
   },
   async transferDCacheGroup(ctx) {
     try {
-      const { appName, moduleName, srcGroupName, dstGroupName, transferData } = ctx.paramsObj;
+      let { appName, moduleName, srcGroupName, dstGroupName, transferData } = ctx.paramsObj;
+      transferData = [true, 'true'].includes(transferData);
       const rsp = await Service.transferDCacheGroup({ appName, moduleName, srcGroupName, dstGroupName, transferData });
       ctx.makeResObj(200, '', rsp);
     } catch (err) {
