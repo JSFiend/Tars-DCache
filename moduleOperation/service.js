@@ -428,14 +428,12 @@ service.getSwitchInfo = async function ({
   return rsp;
 };
 
-let timer = null;
 service.getReleaseProgress = async function (releaseId, appName, moduleName, type, srcGroupName, dstGroupName, transferData) {
   try {
     const { percent } = await ModuleConfigService.getReleaseProgress(releaseId);
     if (+percent !== 100) {
-      timer = setTimeout(service.getReleaseProgress.bind(this, releaseId, appName, moduleName, type, srcGroupName, dstGroupName, transferData), 1500);
+      setTimeout(service.getReleaseProgress.bind(this, releaseId, appName, moduleName, type, srcGroupName, dstGroupName, transferData), 1500);
     } else {
-      clearTimeout(timer);
       await service.configTransfer({ appName, moduleName, type, srcGroupName, dstGroupName, transferData });
     }
   } catch (err) {
