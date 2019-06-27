@@ -1,6 +1,6 @@
 {
   "name": "@tars/dcache",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "`@tars/dcache` 模块， 是 Tars web 的扩展，用于管理 DCache 服务。",
   "main": "index.js",
   "scripts": {
