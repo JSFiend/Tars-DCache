@@ -1,4 +1,8 @@
-## 介绍
+## @tars/dcache
+[![npm](https://img.shields.io/npm/v/@tars/dcache.svg)](https://www.npmjs.com/package/@tars/dcache)
+[![Build Status](https://travis-ci.org/JSFiend/Tars-DCache.svg?branch=master)](https://travis-ci.org/JSFiend/Tars-DCache)
+[![coverage reporting](https://img.shields.io/coveralls/github/JSFiend/Tars-DCache.svg)](https://coveralls.io/github/JSFiend/Tars-DCache)
+
 `@tars/dcache` 模块， 是 Tars web 的扩展，用于管理 DCache 服务。依赖 [Tars web](https://github.com/TarsCloud/TarsWeb) 和 [DCache](https://github.com/Tencent/DCache)，请参考安装文档进行安装再引入 `@tars/dcache` 模块。
 #### 安装
 `@tars/dcache` 模块，依赖 `Tars` 、`Tars web` 和 `DCache`，请参考安装文档进行安装再引入 `@tars/dcache` 模块。
