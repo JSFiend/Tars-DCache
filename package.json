@@ -11,6 +11,9 @@
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
   },
+  "engines": {
+    "node": ">=8.16.0"
+  },
   "pre-commit": [
     "precommit-msg",
     "lint"

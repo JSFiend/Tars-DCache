@@ -1,5 +1,6 @@
 ## @tars/dcache
 [![npm](https://img.shields.io/npm/v/@tars/dcache.svg)](https://www.npmjs.com/package/@tars/dcache)
+[![node](https://img.shields.io/node/v/@tars/dcache.svg)](https://nodejs.org/en/)
 [![Build Status](https://travis-ci.org/JSFiend/Tars-DCache.svg?branch=master)](https://travis-ci.org/JSFiend/Tars-DCache)
 [![coverage reporting](https://img.shields.io/coveralls/github/JSFiend/Tars-DCache.svg)](https://coveralls.io/github/JSFiend/Tars-DCache)
 
